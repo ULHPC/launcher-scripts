@@ -8,6 +8,7 @@ fame & blame to Fotis.
 * parallel: http://en.wikipedia.org/wiki/GNU_parallel
 * libparallel-forkmanager-perl: http://search.cpan.org/~dlux/Parallel-ForkManager-0.7.5/ForkManager.pm
 * oar-parexec: http://servforge.legi.grenoble-inp.fr/pub/soft-trokata/oarutils/oar-parexec.html
+* scoop: https://code.google.com/p/scoop/
 ...
 
 ## Almost relevant
