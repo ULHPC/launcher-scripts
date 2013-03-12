@@ -1,9 +1,7 @@
 -*- mode: markdown; mode: auto-fill; fill-column: 80 -*-
-`README`
+`README` -- [HPC @ UL](http://hpc.uni.lu)
 
-Copyright (c) 2013 [Sebastien Varrette](mailto:<Sebastien.Varrette@uni.lu>) [www](http://varrette.gforge.uni.lu)
-
-        Time-stamp: <Lun 2013-03-11 23:28 svarrette>
+        Time-stamp: <Mar 2013-03-12 02:20 svarrette>
 
 -------------------
 
@@ -26,6 +24,13 @@ We propose here two types of contributions:
 adapt for their own workflow
 * **NOT YET IMPLEMENTED** a more generic ruby script interfaced by a YAML
     configuration file which hold the specificity of each users.
+
+## MPI launcher 
+
+You'll find an example of launcher script for MPI jobs in
+`bash/MPI/mpi_launcher.sh`. 
+To use it to fit your needs, you'll probably want to edit it and adapt (at least)
+the variables `MPI_PROG_BASEDIR`and `MPI_PROG` variables. 
 
 # Contributing to this repository 
 
