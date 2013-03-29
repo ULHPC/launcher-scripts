@@ -61,6 +61,7 @@ SIMULATION=""
 STARTDIR="$(pwd)"
 SCRIPTFILENAME=$(basename $0)
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+CUSTOM_CONF="${SCRIPTDIR}/.${SCRIPTFILENAME}.conf"
 # Where the output files are produced
 [ -n "${SCRATCH}" ] && DATADIR="${SCRATCH}/run/${SCRIPTFILENAME}/`date +%Y-%m-%d`" || DATADIR="${SCRIPTDIR}/run/`date +%Y-%m-%d`"
 # Delay between each run
@@ -77,12 +78,13 @@ MPIRUN=`which mpirun`
 [ -f "${OAR_NODEFILE}" ] && MPI_HOSTFILE="${OAR_NODEFILE}"                   || MPI_HOSTFILE=
 MPI_NPERNODE=
 
-##################################
-#                                #
-#   YOUR OWN DEFAULT SETTINGS    #
-#   (TO BE ADAPTED)              #
-#                                #
-##################################
+######################################
+#                                    #
+#   YOUR OWN DEFAULT SETTINGS        #
+#   (TO BE ADAPTED)                  #
+#   Eventually simply overload these #
+#   setting in .mpi_launcher.conf    #
+######################################
 # MPI_NP=2
 # MPI_NPERNODE=1
 # MPI_HOSTFILE=$HOME/my.hostfile
@@ -93,6 +95,11 @@ MPI_PROG=(osu_get_latency osu_get_bw)
 
 #TODO: args
 #MPI_ARGS=(arg1 arg2)
+
+# Source the local .mpi_launcher.conf
+if [ -f "${CUSTOM_CONF}" ]; then 
+    . ${CUSTOM_CONF}
+fi
 
 # Now you eventually want to adapt the do_it function (or not)
 
