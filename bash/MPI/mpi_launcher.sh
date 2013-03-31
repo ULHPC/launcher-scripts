@@ -36,11 +36,10 @@
 #                                   #
 #####################################
 
-if [ -d  /etc/profile.d/ ]; then
-    for f in /etc/profile.d/*.sh; do
-        [ -f $f ] && . $f
-    done
+if [ -f  /etc/profile ]; then
+    .  /etc/profile
 fi
+
 #####################################
 #                                   #
 #   The launcher global variables   #
@@ -61,7 +60,7 @@ SIMULATION=""
 STARTDIR="$(pwd)"
 SCRIPTFILENAME=$(basename $0)
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-CUSTOM_CONF="${SCRIPTDIR}/.${SCRIPTFILENAME}.conf"
+CUSTOM_CONF="${SCRIPTDIR}/.${SCRIPTFILENAME}.custom.conf"
 # Where the output files are produced
 [ -n "${SCRATCH}" ] && DATADIR="${SCRATCH}/run/${SCRIPTFILENAME}/`date +%Y-%m-%d`" || DATADIR="${SCRIPTDIR}/run/`date +%Y-%m-%d`"
 # Delay between each run
