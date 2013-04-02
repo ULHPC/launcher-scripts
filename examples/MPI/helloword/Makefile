@@ -1,0 +1,1 @@
+../../include/Makefile.simple.with_srcdir
