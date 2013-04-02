@@ -1,7 +1,7 @@
 /**
  * @file   mpi_hello_and_sleep.c
  * @author Sebastien Varrette <Sebastien.Varrette@uni.lu>
- * Time-stamp: <Dim 2013-03-31 12:36 svarrette>
+ * Time-stamp: <Mar 2013-04-02 11:46 svarrette>
  *
  * Copyright (c) 2012 Sebastien Varrette <Sebastien.Varrette@uni.lu>
  *               http://varrette.gforge.uni.lu
@@ -33,14 +33,23 @@
 
 int id = 0; // MPI id for the current process (set global to be used in xprintf)
 
+
+#define NODEVPRINTF(format, ...) vprintf("[Node %i] " format, id, __VA_ARGS__) 
+
 /**
  * Redefinition of the printf to include the buffer flushing
  */
 void xprintf(char *format, ...) {
     va_list args;
     va_start(args, format);
-    printf("[Node %i] ", id);
-    vprintf(format, args);
+    NODEVPRINTF(format, args);
+    /* char * newformat = NULL; */
+    /* sprintf(newformat, "[Node %i] ", id); */
+    /* vsprintf(newformat, ) */
+    /* // build a single string */
+
+    /* printf("[Node %i] ", id); */
+    /* vprintf(format, args); */
     fflush(stdout);
 }
 
