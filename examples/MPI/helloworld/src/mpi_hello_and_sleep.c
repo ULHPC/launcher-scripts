@@ -1,7 +1,7 @@
 /**
  * @file   mpi_hello_and_sleep.c
  * @author Sebastien Varrette <Sebastien.Varrette@uni.lu>
- * Time-stamp: <Mar 2013-04-02 11:46 svarrette>
+ * Time-stamp: <Mar 2013-04-02 15:56 svarrette>
  *
  * Copyright (c) 2012 Sebastien Varrette <Sebastien.Varrette@uni.lu>
  *               http://varrette.gforge.uni.lu
@@ -9,7 +9,7 @@
  * @version 0.1
  *
  * @brief  A simple template for an MPI program that print and hello and wait
- * for n seconds. The elapsed time of the program is also computed.  
+ * for n seconds. The elapsed time of the program is also computed.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,32 +29,26 @@
 #include <stdlib.h>    /* for exit  */
 #include <stdarg.h>    /* for va_{list,args... */
 #include <unistd.h>    /* for sleep */
+#include <string.h>    /* for str[n]cat */
 #include <mpi.h>
 
-int id = 0; // MPI id for the current process (set global to be used in xprintf)
-
-
-#define NODEVPRINTF(format, ...) vprintf("[Node %i] " format, id, __VA_ARGS__) 
+int my_rank() {
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    return rank;
+}
 
 /**
- * Redefinition of the printf to include the buffer flushing
+ * Redefinition of the printf to include the buffer flushing and node rank
  */
-void xprintf(char *format, ...) {
-    va_list args;
-    va_start(args, format);
-    NODEVPRINTF(format, args);
-    /* char * newformat = NULL; */
-    /* sprintf(newformat, "[Node %i] ", id); */
-    /* vsprintf(newformat, ) */
-    /* // build a single string */
-
-    /* printf("[Node %i] ", id); */
-    /* vprintf(format, args); */
-    fflush(stdout);
+#define xprintf(...) { \
+    fprintf( stdout, "[node %i]: ", my_rank()); \
+    fprintf( stdout,  __VA_ARGS__ ) ;          \
+    fflush(  stdout );                          \
 }
 
 int main(int argc, char *argv[]) {
-    int p; // MPI specific: number of processors
+    int p, id; // MPI specific: number of processors and current rank
     unsigned int n      = 0;
     double elapsed_time = 0.0;
 
@@ -71,7 +65,7 @@ int main(int argc, char *argv[]) {
     elapsed_time = -MPI_Wtime();
     // send n to the other processes
     MPI_Bcast((void *)&n, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
-    
+
     // Now do your job
     xprintf("Helloword! I'll now sleep for %us\n", n);
     sleep(n);
