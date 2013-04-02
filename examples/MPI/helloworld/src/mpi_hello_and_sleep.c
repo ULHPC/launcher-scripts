@@ -1,7 +1,7 @@
 /**
  * @file   mpi_hello_and_sleep.c
  * @author Sebastien Varrette <Sebastien.Varrette@uni.lu>
- * Time-stamp: <Mar 2013-04-02 15:56 svarrette>
+ * Time-stamp: <Mar 2013-04-02 16:35 svarrette>
  *
  * Copyright (c) 2012 Sebastien Varrette <Sebastien.Varrette@uni.lu>
  *               http://varrette.gforge.uni.lu
@@ -58,8 +58,12 @@ int main(int argc, char *argv[]) {
 
     if (id == 0) {
         xprintf("Total Number of processes : %i\n",p);
-        xprintf("Input n = ");
-        scanf("%u", &n);
+        if (argc > 1) 
+            n = atoi(argv[1]);
+        else {
+            xprintf("Input n = ");
+            scanf("%u", &n);
+        }
     }
     MPI_Barrier(MPI_COMM_WORLD);
     elapsed_time = -MPI_Wtime();

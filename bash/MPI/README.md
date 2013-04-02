@@ -3,7 +3,7 @@
 
 Copyright (c) 2013 [Sebastien Varrette](mailto:<Sebastien.Varrette@uni.lu>) [www](http://varrette.gforge.uni.lu)
 
-        Time-stamp: <Mar 2013-04-02 15:42 svarrette>
+        Time-stamp: <Mar 2013-04-02 18:23 svarrette>
 
 -------------------
 
@@ -119,3 +119,36 @@ For the
      Helloword! I'll now sleep for 4s
      [node 0]: Elapsed time: 4.000185 s
 
+Now that the interactive run succeed, it's time to embedded the command into a
+launcher. 
+You can obviously add the correct `mpirun` command into a `bash` script (or
+`python`/`ruby`/whatever). 
+You can also use the proposed generic MPI launcher :
+
+    $> ln -s /home/users/svarrette/git/ULHPC/launcher-scripts/bash/MPI/mpi_launcher.sh .
+
+Simply create a configuration file `mpi_launcher.default.conf` containing (at least) the
+definition of the 
+
+    $> vim mpi_launcher.default.conf
+    [...]
+    $> cat mpi_launcher.default.conf
+    MPI_PROG=mpi_hello_and_sleep
+    MPI_PROG_ARG=3
+    $> ./mpi_launcher.sh
+    /mpi_launcher.sh
+    overwriting default configuration
+    => performing MPI run mpi_hello_and_sleep @ Tue Apr  2 16:45:47 CEST 2013
+    => preparing the logfile /tmp//run/mpi_launcher.sh/2013-04-02/435561_results_mpi_hello_and_sleep_16h45m47.log
+    [node 0]: Total Number of processes : 32
+    [node 1]: Helloword! I'll now sleep for 3s
+    [node 2]: Helloword! I'll now sleep for 3s
+    [...]
+    [node 25]: Helloword! I'll now sleep for 3s
+    [node 0]: Elapsed time: 3.000222 s
+    
+You can also exit your reservation to re-run it in passive mode: 
+
+    $> exit 
+    $> oarsub -l enclosure=1/nodes=2,walltime=8 $WORK/tutorials/MPI/helloworld/mpi_launcher.sh
+ 
