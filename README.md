@@ -1,7 +1,7 @@
 -*- mode: markdown; mode: auto-fill; fill-column: 80 -*-
 `README` -- [HPC @ UL](http://hpc.uni.lu)
 
-        Time-stamp: <Mar 2013-03-12 02:20 svarrette>
+        Time-stamp: <Mar 2013-04-02 20:24 svarrette>
 
 -------------------
 
@@ -29,8 +29,8 @@ adapt for their own workflow
 
 You'll find an example of launcher script for MPI jobs in
 `bash/MPI/mpi_launcher.sh`. 
-To use it to fit your needs, you'll probably want to edit it and adapt (at least)
-the variables `MPI_PROG_BASEDIR`and `MPI_PROG` variables. 
+Examples of usage are proposed in `examples/MPI/` 
+
 
 # Contributing to this repository 
 

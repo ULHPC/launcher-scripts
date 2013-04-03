@@ -1,6 +1,12 @@
 #! /bin/bash
 ################################################################################
 # mpi_launcher.sh -  Example of a launcher script for MPI
+# 
+# Usage: see `mpi_launcher.sh -h` (typically feed  a file named
+#   mpi_launcher.default.conf). To run a passive job via OAR:
+#
+#   oarsub [options] -S ./mpi_launcher.sh
+
 ################################################################################
 
 ##########################
@@ -17,7 +23,7 @@
 #          Set the name of the job (up to 15 characters,
 #          no blank spaces, start with alphanumeric character)
 
-#OAR -n JOBNAME
+#OAR -n MPI_JOBNAME
 
 #          By default, the standard output and error streams are sent
 #          to files in the current working directory with names:
@@ -27,8 +33,8 @@
 #          Use the directives below to change the files to which the
 #          standard output and error streams are sent, typically to a common file
 
-#OAR -O JOBNAME-%jobid%.log
-#OAR -E JOBNAME-%jobid%.log
+#OAR -O MPI_JOBNAME-%jobid%.log
+#OAR -E MPI_JOBNAME-%jobid%.log
 
 #####################################
 #                                   #
