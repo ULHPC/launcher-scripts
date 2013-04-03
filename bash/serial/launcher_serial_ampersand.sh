@@ -61,7 +61,7 @@ TASK="$HOME/mytask.sh"
 
 # Define here a file containing the arguments to pass to the task, one line per 
 # expected run. 
-ARG_TASK_FILE=$HOME/mytask.args.example
+ARG_TASK_FILE=
 
 # Total number of tasks to be executed
 [ -n "${ARG_TASK_FILE}" ] && NB_TASKS=`cat ${ARG_TASK_FILE} | wc -l` || NB_TASKS=$(( 2*${NB_CORES_HEADNODE} ))
