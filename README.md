@@ -1,7 +1,7 @@
 -*- mode: markdown; mode: auto-fill; fill-column: 80 -*-
 `README` -- [HPC @ UL](http://hpc.uni.lu)
 
-        Time-stamp: <Mer 2013-04-03 17:35 svarrette>
+        Time-stamp: <Mer 2013-04-03 17:40 svarrette>
 
 -------------------
 
@@ -79,16 +79,16 @@ following completion times performed on the `chaos` cluster for the task
 `mytask.sh` proposed in `bash/serial/mytask.sh`: 
 
       +---------+---------------+--------+--------------+----------------------+-----------+
-      | NB_TASK |    HOSTNAME   | #CORES |    TASK      |    APPROACH          |   TIME    |
+      | NB_TASK |    HOSTNAME   | #CORES |    TASK      |    APPROACH          |   TIME    | 
       +---------+---------------+--------+--------------+----------------------+-----------+
-      |   24    | h-cluster1-32 |   12   | sleep {1-24} | Pure serial          | 5m0.483s  |
+      |   24    | h-cluster1-32 |   12   | sleep {1-24} | Pure serial          | 5m0.483s  | 
       |   24    | h-cluster1-32 |   12   | sleep {1-24} | Ampersand + wait     | 0m24.141s |
       |   24    | h-cluster1-32 |   12   | sleep {1-24} | GNU Parallel (-j 12) | 0m36.404s |
       |   24    | h-cluster1-32 |   12   | sleep {1-24} | GNU Parallel (-j 24) | 0m24.257s |
       +---------+---------------+--------+--------------+----------------------+-----------+
 
 The same benchmark performed for the sample argument file (see
-`bash/serial/mytask.args.example`):
+`bash/serial/mytask.args.example`) to perform tasks of similar duration:
 
       +---------+---------------+--------+---------+----------------------+-----------+
       | NB_TASK |    HOSTNAME   | #CORES | TASK    |    APPROACH          |   TIME    |
