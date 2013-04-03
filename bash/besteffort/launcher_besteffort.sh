@@ -42,13 +42,13 @@
 
 #OAR -t besteffort
 
-#	   If the job is killed, send signal SIGUSR1(10) 10s before killing the job ;
+#	   If the job is killed, send signal SIGUSR2(11) 10s before killing the job ;
 #          then, resubmit the job in an identical way.
 #          Else, the job is terminated normally.
 
 #OAR -t idempotent
 #OAR --checkpoint 60
-#OAR --signal 10
+#OAR --signal 12
 
 
 #####################################
@@ -67,7 +67,7 @@ fi
 #####################################
 
 # Unix signal sent by OAR, SIGUSR1 / 10
-CHKPNT_SIGNAL=10
+CHKPNT_SIGNAL=12
 
 # exit value for job resubmission
 EXIT_UNFINISHED=99
