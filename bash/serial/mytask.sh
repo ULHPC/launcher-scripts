@@ -11,5 +11,8 @@ DURATION=$1
 : ${DURATION:=2}  
 
 echo "*** START $0 ($# args: $*) *** `hostname`: going to sleep for ${DURATION}s"
-sleep ${DURATION}
+for i in `seq 1 ${DURATION}` ; do
+    echo ! Time: $i
+    sleep 1
+done
 echo "*** END $0 ${DURATION} *** `hostname`: exiting"

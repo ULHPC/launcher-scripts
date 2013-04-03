@@ -50,6 +50,12 @@ fi
 # Modules to preload
 MODULE_TO_LOAD=(ictce)
 
+# Characteristics of the reservation: number of cores on the first (and normally
+# only one) node
+NB_CORES_HEADNODE=`cat ${OAR_NODEFILE} | uniq -c | head -n1 | awk '{print $1}'`
+# Default value
+: ${NB_CORES_HEADNODE:=1}
+
 # The [serial] task to be executed i.E. your favorite
 # Java/C/C++/Ruby/Perl/Python/R/whatever program to run
 TASK="$HOME/mytask.sh"
@@ -59,7 +65,7 @@ TASK="$HOME/mytask.sh"
 ARG_TASK_FILE=$HOME/mytask.args.example
 
 # Total number of tasks to be executed
-[ -n "${ARG_TASK_FILE}" ] && NB_TASKS=`cat ${ARG_TASK_FILE} | wc -l` || NB_TASKS=$(( 2*`cat ${OAR_NODEFILE} | uniq -c | head -n1 | awk '{print $1}'` ))
+[ -n "${ARG_TASK_FILE}" ] && NB_TASKS=`cat ${ARG_TASK_FILE} | wc -l` || NB_TASKS=$(( 2*${NB_CORES_HEADNODE} ))
 
 ################# Let's go ###############
 # Load the required modules
