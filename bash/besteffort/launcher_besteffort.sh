@@ -1,9 +1,9 @@
 #! /bin/bash
 ################################################################################
-# launcher_best_effort.sh -  Example of a generic launcher script
+# launcher_besteffort.sh -  Example of a generic launcher script
 #    for running best effort jobs
 #
-# oarsub -S ./launcher_best_effort.sh
+# oarsub -S ./launcher_besteffort.sh
 #
 ################################################################################
 
@@ -16,14 +16,14 @@
 ##########################
 #
 #          Set number of resources
-#
+#          1 core for 1 hour
 
-#OAR -l nodes=1,walltime=01:00:00
+#OAR -l core=1,walltime=01:00:00
 
 #          Set the name of the job (up to 15 characters,
 #          no blank spaces, start with alphanumeric character)
 
-#OAR -n Serial
+#OAR -n Besteffort
 
 #          By default, the standard output and error streams are sent
 #          to files in the current working directory with names:
@@ -50,11 +50,6 @@
 #OAR --checkpoint 60
 #OAR --signal 10
 
-# Unix signal sent by OAR, SIGUSR1 / 10
-CHKPNT_SIGNAL=10
-
-# exit value for job resubmission
-EXIT_UNFINISHED=99
 
 #####################################
 #                                   #
@@ -65,25 +60,27 @@ if [ -f  /etc/profile ]; then
     .  /etc/profile
 fi
 
-# Modules to preload
-MODULE_TO_LOAD=(ictce)
+#####################################
+#
+# Job settings
+#
+#####################################
+
+# Unix signal sent by OAR, SIGUSR1 / 10
+CHKPNT_SIGNAL=10
+
+# exit value for job resubmission
+EXIT_UNFINISHED=99
 
 # The [serial] task to be executed
 TASK="$HOME/mytask.sh 60"
 
-################# Let's go ###############
-# Load the required modules
-for m in ${MODULE_TO_LOAD[*]}; do
-    echo "=> loading the module '$m'"
-    module load $m
-done
-
-# DIRECTORY WHERE TO RUN
-cd $WORK
-
 ##########################################
 # Run the job
 #
+
+# DIRECTORY WHERE TO RUN
+cd $WORK
 
 # execute your command in background
 $TASK &
