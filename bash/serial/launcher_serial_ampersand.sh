@@ -1,9 +1,13 @@
 #! /bin/bash
 ################################################################################
-# launcher_serial_similar_duration.sh -  Example of a generic launcher script 
-#    for running serial tasks, each of them with similar duration
+# launcher_serial_ampersand.sh -  Example of a launcher script for running
+# sequential tasks using the Bash & (ampersand), a builtin control operator used
+# to fork processes, and the wait command. 
+#     
+# Submit this job in passive mode by 
 #
-#   oarsub [options] -S ./launcher_serial_similar_duration.sh
+#   oarsub [options] -S ./launcher_serial_ampersand.sh
+#
 ################################################################################
 
 ##########################
@@ -20,7 +24,7 @@
 #          Set the name of the job (up to 15 characters,
 #          no blank spaces, start with alphanumeric character)
 
-#OAR -n Serial
+#OAR -n SerialAmpersand
 
 #          By default, the standard output and error streams are sent
 #          to files in the current working directory with names:
@@ -30,8 +34,8 @@
 #          Use the directives below to change the files to which the
 #          standard output and error streams are sent, typically to a common file
 
-#OAR -O Serial-%jobid%.log
-#OAR -E Serial-%jobid%.log
+#OAR -O SerialAmpersand-%jobid%.log
+#OAR -E SerialAmpersand-%jobid%.log
 
 #####################################
 #                                   #
@@ -55,22 +59,49 @@ NB_CORES_HEADNODE=`cat ${OAR_NODEFILE} | uniq -c | head -n1 | awk '{print $1}'`
 # Java/C/C++/Ruby/Perl/Python/R/whatever program to run
 TASK="$HOME/mytask.sh"
 
+# Define here a file containing the arguments to pass to the task, one line per 
+# expected run. 
+ARG_TASK_FILE=$HOME/mytask.args.example
+
+# Total number of tasks to be executed
+[ -n "${ARG_TASK_FILE}" ] && NB_TASKS=`cat ${ARG_TASK_FILE} | wc -l` || NB_TASKS=$(( 2*${NB_CORES_HEADNODE} ))
+
 ################# Let's go ###############
 # Load the required modules
 for m in ${MODULE_TO_LOAD[*]}; do 
-    echo "=> loading the module '$m'"
     module load $m
 done
 
 # DIRECTORY WHERE TO RUN 
 cd $WORK
 
-# Run the serial tasks in parallel based on the characterictics of the head node
-# (normally the only one reserved): ampersand off ${NB_CORES_HEADNODE} jobs and
-# wait  
-for i in `seq ${NB_CORES_HEADNODE}`; do 
-    ${TASK} &
-done 
+if [ -z "${ARG_TASK_FILE}" ]; then 
+    # ============
+    #  Example 1:
+    # ============
+    # Fork in parallel: 
+    #    ${TASK} 1
+    #    ${TASK} 2
+    #    [...]
+    #    ${TASK} ${NB_TASKS}
+    for i in `seq 1 ${NB_TASKS}`; do  
+        ${TASK} $i &
+    done 
+else 
+    # ============
+    #  Example 2:
+    # ============
+    # For each line of ${ARG_TASK_FILE}, fork in parallel: 
+    #    ${TASK} <line1>
+    #    ${TASK} <line2>
+    #    [...]
+    #    ${TASK} <lastline>
+    while read line; do
+        ${TASK} $line &
+    done < ${ARG_TASK_FILE}
+fi
+
 wait 
 # /!\ the wait command at the end is crucial; without it the job will terminate
-#     immediately, killing the 8 programs you just started. 
+#     immediately, killing the ${NB_TASKS} forked processes you just started. 
+

@@ -1,9 +1,14 @@
 #! /bin/bash
 ################################################################################
-# launcher_serial_similar_duration.sh -  Example of a generic launcher script 
-#    for running serial tasks, each of them with similar duration
+# NAIVE_AKA_BAD_launcher_serial.sh -  Example of a naive aka. (very) bad launcher script for
+#    running  sequential tasks. 
+#     
+# To see a better way to handle it, see launcher_serial.sh 
 #
-#   oarsub [options] -S ./launcher_serial_similar_duration.sh
+# Submit this job in passive mode by 
+#
+#   oarsub [options] -S ./NAIVE_AKA_BAD_launcher_serial.sh
+#
 ################################################################################
 
 ##########################
@@ -20,7 +25,7 @@
 #          Set the name of the job (up to 15 characters,
 #          no blank spaces, start with alphanumeric character)
 
-#OAR -n Serial
+#OAR -n BADSerial
 
 #          By default, the standard output and error streams are sent
 #          to files in the current working directory with names:
@@ -30,8 +35,8 @@
 #          Use the directives below to change the files to which the
 #          standard output and error streams are sent, typically to a common file
 
-#OAR -O Serial-%jobid%.log
-#OAR -E Serial-%jobid%.log
+#OAR -O BADSerial-%jobid%.log
+#OAR -E BADSerial-%jobid%.log
 
 #####################################
 #                                   #
@@ -45,32 +50,49 @@ fi
 # Modules to preload
 MODULE_TO_LOAD=(ictce)
 
-# Characteristics of the reservation: number of cores on the first (and normally
-# only one) node
-NB_CORES_HEADNODE=`cat ${OAR_NODEFILE} | uniq -c | head -n1 | awk '{print $1}'`
-# Default value
-: ${NB_CORES_HEADNODE:=1}
-
 # The [serial] task to be executed i.E. your favorite
 # Java/C/C++/Ruby/Perl/Python/R/whatever program to run
 TASK="$HOME/mytask.sh"
 
+# Define here a file containing the arguments to pass to the task, one line per 
+# expected run. 
+ARG_TASK_FILE=$HOME/mytask.args.example
+
+# Total number of tasks to be executed
+[ -n "${ARG_TASK_FILE}" ] && NB_TASKS=`cat ${ARG_TASK_FILE} | wc -l` || NB_TASKS=$(( 2*`cat ${OAR_NODEFILE} | uniq -c | head -n1 | awk '{print $1}'` ))
+
 ################# Let's go ###############
 # Load the required modules
 for m in ${MODULE_TO_LOAD[*]}; do 
-    echo "=> loading the module '$m'"
     module load $m
 done
 
 # DIRECTORY WHERE TO RUN 
 cd $WORK
 
-# Run the serial tasks in parallel based on the characterictics of the head node
-# (normally the only one reserved): ampersand off ${NB_CORES_HEADNODE} jobs and
-# wait  
-for i in `seq ${NB_CORES_HEADNODE}`; do 
-    ${TASK} &
-done 
-wait 
-# /!\ the wait command at the end is crucial; without it the job will terminate
-#     immediately, killing the 8 programs you just started. 
+if [ -z "${ARG_TASK_FILE}" ]; then 
+    # ============
+    #  Example 1:
+    # ============
+    # Run in a sequence: 
+    #    ${TASK} 1
+    #    ${TASK} 2
+    #    [...]
+    #    ${TASK} ${NB_TASKS}
+    for i in `seq 1 ${NB_TASKS}`; do  
+        ${TASK} $i
+    done 
+else 
+    # ============
+    #  Example 2:
+    # ============
+    # For each line of ${ARG_TASK_FILE}, run in a sequence: 
+    #    ${TASK} <line1>
+    #    ${TASK} <line2>
+    #    [...]
+    #    ${TASK} <lastline>
+    while read line; do
+        ${TASK} $line
+    done < ${ARG_TASK_FILE}
+fi
+
