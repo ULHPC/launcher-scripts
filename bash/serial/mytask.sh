@@ -8,8 +8,8 @@
 
 DURATION=$1
 
-# Det default values if unset
-: ${DURATION:=2}  
+# Set default values if unset
+: ${DURATION:=2}
 
 echo "*** START $0 *** `hostname`: going to sleep for ${DURATION}s"
 sleep ${DURATION}
