@@ -208,6 +208,8 @@ do_it() {
             logfile="${DATADIR}/${OAR_JOBID}_${NAME}_${prog}_${date_prefix}.log"
         fi
         MPI_CMD="${MPIRUN}"
+        [[ "${MPI_MODULE_SUITE}" =~ "OpenMPI" ]] && MPI_CMD="${MPI_CMD} -x LD_LIBRARY_PATH "
+        [[ "${MPI_MODULE_SUITE}" =~ "MVAPICH" ]] && MPI_CMD="${MPI_CMD} -launcher ssh -launcher-exec /usr/bin/oarsh "
         [ -n "${MPI_HOSTFILE}" ] && MPI_CMD="${MPI_CMD} -hostfile ${MPI_HOSTFILE}"
         [ -n "${MPI_NPERNODE}" ] && MPI_CMD="${MPI_CMD} -npernode ${MPI_NPERNODE}"
         MPI_CMD="${MPI_CMD} -np ${MPI_NP} ${MPI_PROG_BASEDIR}/${prog}"
@@ -223,7 +225,7 @@ do_it() {
 #   ${MPI_CMD}
 ### Starting timestamp: `date +%s`
 EOF
-        verbose "executing ${MPI_CMD}"
+        verbose "executing MPI command '${MPI_CMD}'"
         execute "${MPI_CMD} | tee -a ${logfile}"
         echo "### Ending timestamp:     `date +%s`" >> ${logfile}
         verbose "sleeping ${DELAY}s"

@@ -3,7 +3,7 @@
 
 Copyright (c) 2013 [Sebastien Varrette](mailto:<Sebastien.Varrette@uni.lu>) [www](http://varrette.gforge.uni.lu)
 
-        Time-stamp: <Mar 2013-04-02 18:23 svarrette>
+        Time-stamp: <Dim 2013-11-10 18:50 svarrette>
 
 -------------------
 
@@ -12,14 +12,17 @@ Copyright (c) 2013 [Sebastien Varrette](mailto:<Sebastien.Varrette@uni.lu>) [www
 So you want to run an MPI program on the [UL HPC platform](http://hpc.uni.lu).
 You'll find here an example of a launcher script that you can tweak to suit your
 needs.
-I'll detail here several typical MPI workflow that explain the usage of this
-script:
+There are several typical MPI workflow you might want to try: 
 
 * running a simple Helloworld MPI application
 * running some of the
   [OSU benchmarks](http://mvapich.cse.ohio-state.edu/benchmarks/) to measures
   the MPI performances (bandwidth and latency) of Point-to-Point communications.
 * running the [HPL](http://www.netlib.org/benchmark/hpl/) suit (High-Performance Linpack Benchmark)
+
+Feel free to test and adapt this generic launcher. 
+
+You might also be interested to follow the [tutorial on running HPL](https://github.com/ULHPC/tutorials/tree/devel/advanced/HPL).
 
 
 ## (Generic) Pre-requisite
