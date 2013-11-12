@@ -42,13 +42,13 @@
 
 #OAR -t besteffort
 
-#	   If the job is killed, send signal SIGUSR1(10) 20s before killing the job ;
+#	   If the job is killed, send signal SIGUSR2(12) 20s before killing the job ;
 #          then, resubmit the job in an identical way.
 #          Else, the job is terminated normally.
 
 #OAR -t idempotent
 #OAR --checkpoint 20
-#OAR --signal 10
+#OAR --signal 12
 
 
 #####################################
@@ -67,7 +67,7 @@ fi
 #####################################
 
 # Unix signal sent by OAR, SIGUSR1 / 10
-CHKPNT_SIGNAL=10
+CHKPNT_SIGNAL=12
 
 # exit value for job resubmission
 EXIT_UNFINISHED=99
@@ -75,13 +75,15 @@ EXIT_UNFINISHED=99
 # The task will be executed in 100s
 TASK="$HOME/mytask.sh 100"
 
-# Checkpoint context file
-CONTEXT="$WORK/mytask.context"
+# Checkpoint context file, use the scratch filesystem if available
+CONTEXT=$SCRATCH
+[ "`df -T $SCRATCH | grep -c lustre`" == "0" ] && CONTEXT=$WORK
+CONTEXT="$CONTEXT/mytask.context"
 
 # Run the task with blcr libraries
 RUN="cr_run $TASK"
 # Terminate the process and save its context and all its child
-CHECKPOINT="cr_checkpoint --save-all -f $CONTEXT --kill -T" # + Process ID
+CHECKPOINT="cr_checkpoint -f $CONTEXT --kill -T" # + Process ID
 # Restart the process(es)
 RESTART="cr_restart --no-restore-pid $CONTEXT"
 

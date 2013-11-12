@@ -3,7 +3,7 @@
 
 Copyright (c) 2013 [Sebastien Varrette](mailto:<Sebastien.Varrette@uni.lu>) [www](http://varrette.gforge.uni.lu)
 
-        Time-stamp: <Mar 2013-04-02 18:23 svarrette>
+        Time-stamp: <Mar 2013-11-12 13:24 svarrette>
 
 -------------------
 
@@ -12,8 +12,7 @@ Copyright (c) 2013 [Sebastien Varrette](mailto:<Sebastien.Varrette@uni.lu>) [www
 So you want to run an MPI program on the [UL HPC platform](http://hpc.uni.lu).
 You'll find here an example of a launcher script that you can tweak to suit your
 needs.
-I'll detail here several typical MPI workflow that explain the usage of this
-script:
+There are several typical MPI workflow you might want to try: 
 
 * running a simple Helloworld MPI application
 * running some of the
@@ -21,13 +20,17 @@ script:
   the MPI performances (bandwidth and latency) of Point-to-Point communications.
 * running the [HPL](http://www.netlib.org/benchmark/hpl/) suit (High-Performance Linpack Benchmark)
 
+Feel free to test and adapt this generic launcher. 
+
+You might also be interested to follow the [tutorial on running HPL](https://github.com/ULHPC/tutorials/tree/devel/advanced/HPL).
+
 
 ## (Generic) Pre-requisite
 
 Connect to your favorite cluster frontend (here: `chaos`)
 
       $> ssh chaos-cluster
-
+      
 Reserve interactively two full nodes, ideally belonging to the same enclosure: 
 
      (access-chaos)$> oarsub -I -l enclosure=1/nodes=2,walltime=8
@@ -60,7 +63,7 @@ Prepare your working directory
      $> ln -s ~/git/ULHPC/launcher-scripts/examples/include .
      
      
-## MPI helloworld
+## Basic example: MPI helloworld
 
 As you cloned the repository, you'll find everything ready to test the MPI
 helloword example in `~/git/ULHPC/launcher-scripts/examples/MPI/helloworld`.
@@ -75,7 +78,8 @@ Now you can check everything work (in interactive mode), for instance with the
      
      $> module load OpenMPI
      $> make
-     $> mpirun -hostfile $OAR_NODEFILE ./mpi_hello_and_sleep
+     $> cp mpi_hello_and_sleep mpi_hello_and_sleep.openmpi
+     $> mpirun -x LD_LIBRARY_PATH -hostfile $OAR_NODEFILE ./mpi_hello_and_sleep
      [node 0]: Total Number of processes : 32
      [node 0]: Input n = 2
      [node 1]: Helloword! I'll now sleep for 2s
@@ -90,12 +94,13 @@ For [MVAPICH2](http://mvapich.cse.ohio-state.edu/overview/mvapich2/):
      $> module purge
      $> module load MVAPICH2
      $> make 
-     $> mpirun -hostfile $OAR_NODEFILE ./mpi_hello_and_sleep
+     $> cp mpi_hello_and_sleep mpi_hello_and_sleep.mvapich2
+     $> mpirun -launcher ssh -launcher-exec /usr/bin/oarsh -hostfile $OAR_NODEFILE ./mpi_hello_and_sleep
      [Node 0] Total Number of processes : 32
      [Node 0] Input n = 1
-     [Node 0] [Node 1] Helloword! I'll now sleep for 4s
-     [Node 2] Helloword! I'll now sleep for 4s
-     [Node 3] Helloword! I'll now sleep for 4s
+     [Node 0] [Node 1] Helloword! I'll now sleep for 1s
+     [Node 2] Helloword! I'll now sleep for 1s
+     [Node 3] Helloword! I'll now sleep for 1s
      [...]
      Helloword! I'll now sleep for 1s
      [node 0]: Elapsed time: 1.000727 s
@@ -107,6 +112,7 @@ For the
      $> module purge
      $> module load ictce
      $> make 
+     $> cp mpi_hello_and_sleep mpi_hello_and_sleep.impi     
      $> mpirun -hostfile $OAR_NODEFILE ./mpi_hello_and_sleep
      [node 0]: Total Number of processes : 32
      [node 0]: Input n = 4
@@ -123,32 +129,45 @@ Now that the interactive run succeed, it's time to embedded the command into a
 launcher. 
 You can obviously add the correct `mpirun` command into a `bash` script (or
 `python`/`ruby`/whatever). 
-You can also use the proposed generic MPI launcher :
+You can also use the proposed [generic MPI launcher](https://github.com/ULHPC/launcher-scripts/blob/devel/bash/MPI/mpi_launcher.sh) :
 
-    $> ln -s /home/users/svarrette/git/ULHPC/launcher-scripts/bash/MPI/mpi_launcher.sh .
+    $> ln -s ~/git/ULHPC/launcher-scripts/bash/MPI/mpi_launcher.sh launcher_mpi_helloworld
 
-Simply create a configuration file `mpi_launcher.default.conf` containing (at least) the
-definition of the 
+You can run again each program as follows:
 
-    $> vim mpi_launcher.default.conf
-    [...]
-    $> cat mpi_launcher.default.conf
-    MPI_PROG=mpi_hello_and_sleep
-    MPI_PROG_ARG=3
-    $> ./mpi_launcher.sh
-    /mpi_launcher.sh
-    overwriting default configuration
-    => performing MPI run mpi_hello_and_sleep @ Tue Apr  2 16:45:47 CEST 2013
-    => preparing the logfile /tmp//run/mpi_launcher.sh/2013-04-02/435561_results_mpi_hello_and_sleep_16h45m47.log
-    [node 0]: Total Number of processes : 32
-    [node 1]: Helloword! I'll now sleep for 3s
-    [node 2]: Helloword! I'll now sleep for 3s
-    [...]
-    [node 25]: Helloword! I'll now sleep for 3s
-    [node 0]: Elapsed time: 3.000222 s
+    $> ./launcher_mpi_helloworld --module OpenMPI  --exe mpi_hello_and_sleep.openmpi
+    $> ./launcher_mpi_helloworld --module MVAPICH2 --exe mpi_hello_and_sleep.mvapich2
+    $> ./launcher_mpi_helloworld --module ictce    --exe mpi_hello_and_sleep.impi
+
+
+The symbolic link approach is quite flexible as the script allows you to
+predefine a set of variable you would normally pass as command line (run with
+the `--help` option) in a configuration file name `<scriptname>.default.conf`. 
+
+For instance, assuming you create a configuration file `launcher_mpi_helloworld.default.conf` as follows: 
+
+    $> cat launcher_mpi_helloworld.default.conf
+    # Run MPI Helloworld
+    NAME=openmpi
+    
+    MODULE_TO_LOAD=OpenMPI
+    
+    MPI_PROGstr=mpi_hello_and_sleep.openmpi
+
+You can run the OpenMPI approach far more simply by 
+
+    $> ./launcher_mpi_helloworld
+
     
 You can also exit your reservation to re-run it in passive mode: 
 
     $> exit 
-    $> oarsub -l enclosure=1/nodes=2,walltime=8 $WORK/tutorials/MPI/helloworld/mpi_launcher.sh
+    $> oarsub -l enclosure=1/nodes=2,walltime=8 "$WORK/tutorials/MPI/helloworld/mpi_launcher.sh --args 2"
  
+ 
+## Advanced example: [OSU micro-benchmarks](http://mvapich.cse.ohio-state.edu/benchmarks/) and [HPL](http://www.netlib.org/benchmark/hpl/)
+
+You can find more advanced example using the [generic MPI launcher](https://github.com/ULHPC/launcher-scripts/blob/devel/bash/MPI/mpi_launcher.sh)  (or adapted version) in the following [UL HPC tutorials](https://github.com/ULHPC/tutorials):
+
+* [running the OSU Micro-Banchmarks](https://github.com/ULHPC/tutorials/tree/devel/advanced/OSU_MicroBenchmarks)
+* [running HPL](https://github.com/ULHPC/tutorials/tree/devel/advanced/HPL)
