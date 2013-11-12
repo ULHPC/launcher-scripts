@@ -233,9 +233,9 @@ do_it() {
         echo "=> performing MPI run ${prog} @ `date`"
         date_prefix=`date +%Hh%Mm%S`
         if [ -z "${NAME}" ]; then
-            logfile="${DATADIR}/${OAR_JOBID}_results_${prog}_${date_prefix}.log"
+            logfile="${DATADIR_ABSPATH}/${OAR_JOBID}_results_${prog}_${date_prefix}.log"
         else
-            logfile="${DATADIR}/${OAR_JOBID}_${NAME}_${prog}_${date_prefix}.log"
+            logfile="${DATADIR_ABSPATH}/${OAR_JOBID}_${NAME}_${prog}_${date_prefix}.log"
         fi
         command="${MPI_CMD} ./${prog}"
         [ -n "${MPI_PROG_ARG}" ] && command="$command ${MPI_PROG_ARG}"
@@ -354,6 +354,7 @@ fi
 
 # Move to the directory
 execute "cd ${DATADIR}"
+DATADIR_ABSPATH=`pwd`
 
 # BEFORE HOOK
 if [ -f "${CUSTOM_HOOK_BEFORE}" ]; then
