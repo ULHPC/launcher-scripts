@@ -119,22 +119,30 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 EOF
 }
 print_help() {
-    cat <<EOF
+    less <<EOF
 NAME
-    $COMMAND -- Example of a MPI launcher script for the UL HPC platform
+    $COMMAND -- MPI launcher script for the UL HPC platform
 
 SYNOPSIS
     $COMMAND [-V | -h]
     $COMMAND [--debug] [-v] [-n]
     $COMMAND [--mpirun PATH] [--name NAME] [-npernode N] [-hostfile FILE] [--delay N] \
-             [--basedir DIR] [--prog prog1[,prog2,...] ]
+             [--basedir DIR] [--exe prog1[,prog2,...] ]
 
 DESCRIPTION
     $COMMAND runs MPI programs on the UL HPC platform. You can easily customize
-    it by creating a local file ${CUSTOM_CONF} containg the following variables:
+    it by creating a local file ${CUSTOM_CONF} to overload the variables set on the 
+    command line, mainly:
 
-    * MPI_MODULE_SUITE: the MPI suite to use (Default: 'OpenMPI')
-    * MPI_PROG : the MPI program to execute
+    * MODULE_TO_LOADstr comma-separated list of modules to load
+    * MPI_PROG_BASEDIR  root directory hosting the MPI programs to execute
+                        Default: ${MPI_PROG_BASEDIR}  
+    * MPI_PROGstr       comma-separated list of MPI programs to execute (with relative 
+                        path to MPI_PROG_BASEDIR)
+    * MPI_NPERNODE      what you might precise via -npernode command
+    * MPIRUN            mpirun command to use 
+    * MACHINEFILE       machine file (or hostfile) to use
+    etc... 
 
 OPTIONS
     --debug
