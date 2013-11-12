@@ -296,7 +296,7 @@ while [ $# -ge 1 ]; do
         --name)        shift; NAME=$1;;
         --mpirun)      shift; MPIRUN=$1;;
         -np)           shift; MPI_NP=$1;;
-        -npernode | -perhost | --npernode | --perhost)     
+        -npernode | -perhost | -ppn | --npernode | --perhost | --ppn)     
             shift; MPI_NPERNODE=$1;;
         -hostfile | --hostfile | --machinefile)
             shift; MACHINEFILE=$1;;
@@ -335,9 +335,13 @@ else
     [ $MPI_NP -gt 1 ] && MPI_CMD="${MPI_CMD} -np ${MPI_NP}"
 fi
 if [ -n "${MPI_NPERNODE}" ]; then
-    [[ "${MODULE_TO_LOAD}" =~ "ictce" ]] && MPI_CMD="${MPI_CMD} -perhost ${MPI_NPERNODE}" || MPI_CMD="${MPI_CMD} -npernode ${MPI_NPERNODE}"
-fi
-#[ $MPI_NP -gt 1 ] && MPI_CMD="${MPI_CMD} -np ${MPI_NP}"
+    NPERNODE_CMDLINE='-npernode'
+    [[ "${MODULE_TO_LOAD}" =~ "ictce" ]]  && NPERNODE_CMDLINE='-perhost'
+    [[ "${MODULE_TO_LOAD}" =~ "impi" ]]   && NPERNODE_CMDLINE='-perhost'
+    [[ "${MODULE_TO_LOAD}" =~ "OpenMPI"]] && NPERNODE_CMDLINE='-npernode'
+    [[ "${MODULE_TO_LOAD}" =~ "MVAPICH"]] && NPERNODE_CMDLINE='-ppn'
+    MPI_CMD="${MPI_CMD} ${NPERNODE_CMDLINE} ${MPI_NPERNODE}"
+fi 
 
 verbose "MPI command: '${MPI_CMD}'"
 
