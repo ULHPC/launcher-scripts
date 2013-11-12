@@ -282,7 +282,7 @@ while [ $# -ge 1 ]; do
         --name)        shift; NAME=$1;;
         --mpirun)      shift; MPIRUN=$1;;
         -np)           shift; MPI_NP=$1;;
-        -npernode | -perhost )     
+        -npernode | -perhost | --npernode | --perhost)     
             shift; MPI_NPERNODE=$1;;
         -hostfile | --hostfile | --machinefile)
             shift; MACHINEFILE=$1;;
