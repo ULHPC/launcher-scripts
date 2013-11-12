@@ -1,7 +1,7 @@
 #! /bin/bash
 ################################################################################
 # mpi_launcher.sh -  Example of a launcher script for MPI
-# 
+#
 # Usage: see `mpi_launcher.sh -h` (typically feed  a file named
 #   mpi_launcher.default.conf). To run a passive job via OAR:
 #
@@ -67,14 +67,14 @@ STARTDIR="$(pwd)"
 SCRIPTFILENAME=$(basename $0)
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Where the output files are produced
-DATADIR_RELATIVEPATH="run/${SCRIPTFILENAME}/`date +%Y-%m-%d`"
-if [ -n "${SCRATCH}" ]; then 
+DATADIR_RELATIVEPATH="runs/${SCRIPTFILENAME}/`date +%Y-%m-%d`"
+if [ -n "${SCRATCH}" ]; then
     [ "${SCRATCH}" != "/tmp" ] && DATADIR="${SCRATCH}/${DATADIR_RELATIVEPATH}" || DATADIR="${WORK}/${DATADIR_RELATIVEPATH}"
-else 
-    DATADIR="${SCRIPTDIR}/run/`date +%Y-%m-%d`"
-fi 
+else
+    DATADIR="${SCRIPTDIR}/${DATADIR_RELATIVEPATH}"
+fi
 # Delay between each run
-DELAY=10
+DELAY=1
 
 ### User customization handling
 # Custom file where you can overload the default variables set for MPI
@@ -89,14 +89,20 @@ CUSTOM_HOOK_AFTER="${SCRIPTDIR}/`basename ${SCRIPTFILENAME} .sh`.hook.after"
 #   The launcher MPI settings    #
 #                                #
 ##################################
-# MPI module suite (available: OpenMPI, MVAPICH2, ictce)
-MPI_MODULE_SUITE=OpenMPI
-[ -f "${OAR_NODEFILE}" ] && MPI_NP=`wc -l ${OAR_NODEFILE} | cut -d " " -f 1` || MPI_NP=1
-[ -f "${OAR_NODEFILE}" ] && MPI_HOSTFILE="${OAR_NODEFILE}"                   || MPI_HOSTFILE=
+# MPI stuff
+MPIRUN="mpirun"
+MACHINEFILE="${OAR_NODEFILE}"
+MPI_NP=1
+[ -f "/proc/cpuinfo" ]   && MPI_NP=`grep processor /proc/cpuinfo | wc -l`
+[ -n "${OAR_NODEFILE}" ] && MPI_NP=`cat ${OAR_NODEFILE} | wc -l`
 MPI_NPERNODE=
+
+# MPI program to execute
 MPI_PROG_BASEDIR=${SCRIPTDIR}
 MPI_PROG=
+MPI_PROGstr=""
 MPI_PROG_ARG=
+
 
 ########################################
 #                                      #
@@ -120,14 +126,15 @@ NAME
 SYNOPSIS
     $COMMAND [-V | -h]
     $COMMAND [--debug] [-v] [-n]
-    $COMMAND [--mpirun PATH] [--name NAME] [-np N] [-npernode N] [-hostfile FILE] [--delay N] 
+    $COMMAND [--mpirun PATH] [--name NAME] [-npernode N] [-hostfile FILE] [--delay N] \
+             [--basedir DIR] [--prog prog1[,prog2,...] ]
 
 DESCRIPTION
     $COMMAND runs MPI programs on the UL HPC platform. You can easily customize
-    it by creating a local file ${CUSTOM_CONF} containg the following variables: 
+    it by creating a local file ${CUSTOM_CONF} containg the following variables:
 
     * MPI_MODULE_SUITE: the MPI suite to use (Default: 'OpenMPI')
-    * MPI_PROG : the MPI program to execute 
+    * MPI_PROG : the MPI program to execute
 
 OPTIONS
     --debug
@@ -142,6 +149,8 @@ OPTIONS
         Display the version number then quit.
     --name NAME
         Set the job name
+   --module MODULE[,MODULE2...]
+        Preload the module(s) prior to the run.
     -npernode N
     -np N
     -hostfile FILE
@@ -150,6 +159,13 @@ OPTIONS
        Absolute path to the used mpirun command
     --delay
        Delay between consecutive runs (${DELAY}s by default)
+    --basedir DIR
+       Set the root directory of the programs to be run 
+       Default: ${MPI_PROG_BASEDIR}
+    --exe EXE[,EXE2...]
+       Define the MPI programs to execute (with a relative path to BASEDIR)
+    --args "ARGS"
+       Define the optionnal command-line arguments to pass to the MPI programs to run
 
 AUTHOR
     UL HPC sysadmin team <hpc-sysadmins@uni.lu>
@@ -207,13 +223,8 @@ do_it() {
         else
             logfile="${DATADIR}/${OAR_JOBID}_${NAME}_${prog}_${date_prefix}.log"
         fi
-        MPI_CMD="${MPIRUN}"
-        [[ "${MPI_MODULE_SUITE}" =~ "OpenMPI" ]] && MPI_CMD="${MPI_CMD} -x LD_LIBRARY_PATH "
-        [[ "${MPI_MODULE_SUITE}" =~ "MVAPICH" ]] && MPI_CMD="${MPI_CMD} -launcher ssh -launcher-exec /usr/bin/oarsh "
-        [ -n "${MPI_HOSTFILE}" ] && MPI_CMD="${MPI_CMD} -hostfile ${MPI_HOSTFILE}"
-        [ -n "${MPI_NPERNODE}" ] && MPI_CMD="${MPI_CMD} -npernode ${MPI_NPERNODE}"
-        MPI_CMD="${MPI_CMD} -np ${MPI_NP} ${MPI_PROG_BASEDIR}/${prog}"
-        [ -n "${MPI_PROG_ARG}" ] && MPI_CMD="${MPI_CMD} ${MPI_PROG_ARG}"
+        command="${MPI_CMD} ./${prog}"
+        [ -n "${MPI_PROG_ARG}" ] && command="$command ${MPI_PROG_ARG}"
         echo "=> preparing the logfile ${logfile}"
         cat > ${logfile} <<EOF
 # ${logfile}
@@ -222,13 +233,20 @@ do_it() {
 # Initial command: ${COMMAND_LINE}
 #
 # Generated @ `date` by:
-#   ${MPI_CMD}
+#   $command
+# (command performed in ${MPI_PROG_BASEDIR})
 ### Starting timestamp: `date +%s`
 EOF
-        verbose "executing MPI command '${MPI_CMD}'"
-        execute "${MPI_CMD} | tee -a ${logfile}"
+        debug "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
+        echo "=> running '$command'"
+        if [ -z "${SIMULATION}" ]; then
+            cd ${MPI_PROG_BASEDIR}
+            echo "   command performed in `pwd`"
+            $command |& tee -a ${logfile}
+            cd -
+        fi
         echo "### Ending timestamp:     `date +%s`" >> ${logfile}
-        verbose "sleeping ${DELAY}s"
+        echo "=> now sleeping for ${DELAY}s"
         sleep $DELAY
     done
 }
@@ -240,20 +258,10 @@ EOF
 #   Eventually simply overload these     #
 #   setting in mpi_launcher.default.conf #
 ##########################################
-if [ -f "${CUSTOM_CONF}" ]; then 
+if [ -f "${CUSTOM_CONF}" ]; then
     info "overwriting default configuration"
     . ${CUSTOM_CONF}
 fi
-
-# MPI_PROG_BASEDIR="$HOME/stow/osu-micro-benchmarks-3.8/libexec/osu-micro-benchmarks/mpi/one-sided"
-# # List (bash array) of MPI programs (relative to ${MPI_PROG_BASEDIR}) to be run
-# MPI_PROG=(osu_get_latency osu_get_bw)
-
-#TODO: args
-#MPI_ARGS=(arg1 arg2)
-
-
-
 
 ################################################################################
 ################################################################################
@@ -269,29 +277,60 @@ while [ $# -ge 1 ]; do
             VERBOSE="--verbose";;
         -v | --verbose)  VERBOSE="--verbose";;
         -n | --dry-run)  SIMULATION="--dry-run";;
-        --name)        shift; NAME=$1;;
-        -npernode)     shift; MPI_NPERNODE=$1;;
-        -np)           shift; MPI_NP=$1;;
-        -hostfile)     shift; MPI_HOSTFILE=$1;;
-        --mpirun)      shift; MPIRUN=$1;;
+        --module)      shift; MODULE_TO_LOADstr="$1";;
         --delay)       shift; DELAY=$1;;
+        --name)        shift; NAME=$1;;
+        --mpirun)      shift; MPIRUN=$1;;
+        -np)           shift; MPI_NP=$1;;
+        -npernode | -perhost )     
+            shift; MPI_NPERNODE=$1;;
+        -hostfile | --hostfile | --machinefile)
+            shift; MACHINEFILE=$1;;
+        --basedir)     shift; MPI_PROG_BASEDIR=$1;;
+        -e | --exe | --prog)
+            shift; MPI_PROGstr="$1";;
+        --args)        shift; MPI_PROG_ARG="$1";;
     esac
     shift
 done
 
-[ -z "${MPI_MODULE_SUITE}" ] && print_error_and_exit "An MPI module suite have to be selected"
-module load ${MPI_MODULE_SUITE}
+# Prepare array of programs to execute and modules to load
+[ -n "${MODULE_TO_LOADstr}" ] && IFS=',' read -a MODULE_TO_LOAD <<< "${MODULE_TO_LOADstr}"
+[ -n "${MPI_PROGstr}" ]       && IFS=',' read -a MPI_PROG       <<< "${MPI_PROGstr}"
 
+# Load the modules
+if [ -n "${MODULE_TO_LOAD}" ]; then
+    info "purging modules"
+    execute "module purge"
+    for mod in ${MODULE_TO_LOAD[*]}; do
+        info "loading module $mod"
+        execute "module load $mod"        
+    done 
+    execute "module list"
+fi
 
-# Local MPI commands
-MPIRUN=`which mpirun`
-[ -z "${MPIRUN}" ] && print_error_and_exit "unable to find the mpirun command"
+# Prepare the MPI command
+MPI_CMD="${MPIRUN} "
+[[ "${MODULE_TO_LOAD}" =~ "OpenMPI" ]] && MPI_CMD="${MPI_CMD} -x LD_LIBRARY_PATH "
+[[ "${MODULE_TO_LOAD}" =~ "MVAPICH" ]] && MPI_CMD="${MPI_CMD} -launcher ssh -launcher-exec /usr/bin/oarsh "
+if [ -n "${MACHINEFILE}" -a -f "${MACHINEFILE}" ]; then
+    MPI_NP=`cat ${MACHINEFILE} | wc -l`
+    MPI_CMD="${MPI_CMD} -hostfile ${MACHINEFILE}"
+else 
+    [ $MPI_NP -gt 1 ] && MPI_CMD="${MPI_CMD} -np ${MPI_NP}"
+fi
+if [ -n "${MPI_NPERNODE}" ]; then
+    [[ "${MODULE_TO_LOAD}" =~ "ictce" ]] && MPI_CMD="${MPI_CMD} -perhost ${MPI_NPERNODE}" || MPI_CMD="${MPI_CMD} -npernode ${MPI_NPERNODE}"
+fi
+#[ $MPI_NP -gt 1 ] && MPI_CMD="${MPI_CMD} -np ${MPI_NP}"
 
-[ -z "${MPI_PROG}" ] && print_error_and_exit "Could not find any MPI program to execute: you shall define MPI_PROG"
+verbose "MPI command: '${MPI_CMD}'"
+
+[ -z "${MPI_PROGstr}" ] && print_error_and_exit "Could not find any MPI program to execute: you shall define MPI_PROG or use --prog option"
 
 # Resources allocated
-verbose "==== `wc -l $OAR_NODEFILE | cut -d " " -f 1` allocated resources used for the execution of ${MPI_PROG} ==="
-[ -n "${VERBOSE}" ] && cat $OAR_NODEFILE
+verbose "==== ${MPI_NP} allocated resources used for the execution of ${MPI_PROGstr} ==="
+[ -n "${VERBOSE}" ] && cat $OAR_NODEFILE|uniq -c
 
 if [ ! -d ${DATADIR} ]; then
     echo "=> creating ${DATADIR}"
@@ -301,14 +340,16 @@ fi
 # Move to the directory
 execute "cd ${DATADIR}"
 
+# BEFORE HOOK
 if [ -f "${CUSTOM_HOOK_BEFORE}" ]; then
     echo "=> Executing before hook ${CUSTOM_HOOK_BEFORE}"
     . ${CUSTOM_HOOK_BEFORE}
 fi
 
-# Just do what you're supposed to do 
+# Just do what you're supposed to do ;)
 do_it
 
+# AFTER HOOK
 if [ -f "${CUSTOM_HOOK_AFTER}" ]; then
     echo "=> Executing after hook ${CUSTOM_HOOK_AFTER}"
     . ${CUSTOM_HOOK_AFTER}
