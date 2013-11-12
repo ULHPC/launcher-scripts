@@ -22,8 +22,8 @@ hopefully more efficient) on the following typical workflows:
  * serial (or sequential) tasks having varying durations, run on one node
  * serial (or sequential) tasks having varying durations, run on multiple nodes
 
-* MPI run on n processes (ex: HPL) with abstraction of the MPI stack, MPI script, option to compile the code etc.
-* MPI run on n process per node (ex: OSU benchs)
+* MPI run on n processes (ex: [HPL](https://github.com/ULHPC/tutorials/tree/devel/advanced/HPL)) with abstraction of the MPI stack, MPI script, option to compile the code etc.
+* MPI run on n process per node (ex: [OSU Micro-benchmarks](https://github.com/ULHPC/tutorials/tree/devel/advanced/OSU_MicroBenchmarks))
 
 We propose here two types of contributions:
 
