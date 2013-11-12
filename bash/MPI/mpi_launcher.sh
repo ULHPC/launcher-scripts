@@ -126,7 +126,7 @@ NAME
 SYNOPSIS
     $COMMAND [-V | -h]
     $COMMAND [--debug] [-v] [-n]
-    $COMMAND [--mpirun PATH] [--name NAME] [-npernode N] [-hostfile FILE] [--delay N] \
+    $COMMAND [--mpirun PATH] [--datadir DIR] [--name NAME] [-npernode N] [-hostfile FILE] [--delay N] \
              [--basedir DIR] [--exe prog1[,prog2,...] ]
 
 DESCRIPTION
@@ -169,6 +169,12 @@ OPTIONS
        Delay between consecutive runs (${DELAY}s by default)
     --basedir DIR
        Set the root directory of the programs to be run 
+       Default: ${MPI_PROG_BASEDIR}
+    --datadir DIR
+       Set the root directory of the data directory that will host the outpiyt logs of the run 
+       Default: ${DATADIR}
+    --datadir DIR
+       Set the data  directory of the programs to be run 
        Default: ${MPI_PROG_BASEDIR}
     --exe EXE[,EXE2...]
        Define the MPI programs to execute (with a relative path to BASEDIR)
@@ -295,6 +301,7 @@ while [ $# -ge 1 ]; do
         -hostfile | --hostfile | --machinefile)
             shift; MACHINEFILE=$1;;
         --basedir)     shift; MPI_PROG_BASEDIR=$1;;
+        --datadir)     shift; DATADIR=$1;;
         -e | --exe | --prog)
             shift; MPI_PROGstr="$1";;
         --args)        shift; MPI_PROG_ARG="$1";;
