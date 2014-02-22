@@ -1,4 +1,3 @@
-
 ## Tools to employ currently
 
 * disparm https://oss.trac.surfsara.nl/disparm  ### svn co https://oss.trac.surfsara.nl/disparm/svn disparm
@@ -29,8 +28,8 @@
 
 ## extras
 
-Galaxy: http://galaxyproject.org/ # it can be used in non-biomedical applications context, too!
-SAGA: http://saga-project.github.io/saga-python/
-task spooler: http://vicerveza.homeunix.net/~viric/soft/ts/
-pyres: https://github.com/binarydud/pyres # this is for software engineers, alternatively use `resque`
-PaRSEC: http://icl.cs.utk.edu/parsec/ # PaRSEC is a generic framework for architecture aware scheduling at core level
+* Galaxy: http://galaxyproject.org/ # it can be used in non-biomedical applications context, too!
+* SAGA: http://saga-project.github.io/saga-python/
+* task spooler: http://vicerveza.homeunix.net/~viric/soft/ts/
+* pyres: https://github.com/binarydud/pyres # this is for software engineers, alternatively use `resque`
+* PaRSEC: http://icl.cs.utk.edu/parsec/ # PaRSEC is a generic framework for architecture aware scheduling at core level
