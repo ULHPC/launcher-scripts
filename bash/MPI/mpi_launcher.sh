@@ -171,7 +171,7 @@ OPTIONS
        Set the root directory of the programs to be run
        Default: ${MPI_PROG_BASEDIR}
     --datadir DIR
-       Set the root directory of the data directory that will host the outpiyt logs of the run
+       Set the root directory of the data directory that will host the output logs of the run
        Default: ${DATADIR}
     --datadir DIR
        Set the data  directory of the programs to be run
