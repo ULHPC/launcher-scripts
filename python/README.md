@@ -2,7 +2,9 @@
 
 ## Launcher for many single-core processes
 
-run launcher_serial.py
+run 
+
+    oarsub -S "./launcher_serial.py"
 
 ## Launcher for MPI-processes
 
