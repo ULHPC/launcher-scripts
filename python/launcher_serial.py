@@ -1,33 +1,26 @@
 #!/usr/bin/env python
 """Launcher for serial processes based on bash script
-launcher_serial.sh
-
-Run with oarsub -S './@file'
-"""
+launcher_serial.sh"""
 
 ###   The OAR  directives  ###
 # If oarsub is run in batch mode with -S (or --scanscript)
-# the script is scanned for '#OAR' as OAR directives. 
+# the script is scanned for '#OAR' as OAR directives.
 # They are:
 #
 #        Number of resources:
-#OAR -l nodes=2,walltime=1
+#OAR -l nodes=1,walltime=1
 #        Job name (max. 15 characters, no blank spaces and
 #        start with alphanumeric character):
 #OAR -n SerialGNUParallel
 #        Redirecting stdout and stderr
 #        (OAR.%jobid%.stdout, OAR.%jobid%.stderr)
 #        to the following:
-#OAR -O SerialGNUParallel-%jobid%.log
-#OAR -E SerialGNUParallel-%jobid%.log
+#OAR -O SerialGNUParallel-out-%jobid%.log
+#OAR -E SerialGNUParallel-err-%jobid%.log
 
 from os import environ, system
 from time import time, ctime
-
-localpath = "%s/testing" %environ['HOME']
-task = "%s/testprocess.py" %localpath
-task_argumentFile = "%s/argumentlist.dat" %localpath
-modulesToLoad = []
+from sys import argv
 
 
 def readAvailableNodes( nodefilename ):
@@ -47,6 +40,13 @@ def readAvailableNodes( nodefilename ):
     
 
 if __name__ == "__main__":
+    if len(argv)<3:
+        print("Usage: %s task argumentfile [modules to load]" %argv[0])
+        exit(1)
+    task = argv[1]
+    task_argumentFile = argv[2]
+    modulesToLoad = argv[3:]
+
     # load required modules
     for module in modulesToLoad:
         system("module load %s" %module)
