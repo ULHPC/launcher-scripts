@@ -62,8 +62,8 @@ if __name__ == "__main__":
     coreDistribution = ""
     if len(nodes.keys()) > 1:
         # write nodes and number of cores into sshloginfile
-        fSSHloginfile = open( "/tmp/SSHloginFile.%i" %int(environ['OAR_JOBID']),
-                              'w' )
+        sshloginfilename = "/tmp/SSHloginFile.%i" %int(environ['OAR_JOBID'])
+        fSSHloginfile = open( sshloginfilename, 'w' )
         for k in nodes.keys():
             fSSHloginfile.write("%i/oarsh %s\n" %(nodes[k], k))
         fSSHloginfile.close()
