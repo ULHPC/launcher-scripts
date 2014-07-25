@@ -2,11 +2,13 @@
 
 ## Launcher for many single-core processes
 
-Run 
+On frontend run:
 
-    oarsub -S "./launcher_serial.py task argumentfile [modules to load]"
+    oarsub -S "pathTo/launcher_serial.py pathTo/task pathTo/argumentfile [modules to load]"
 
-Requested resources (nodes=1) and walltime (1h) are defined as OAR-directives in file.
+The requested resources (default: nodes=1) and walltime (default: 1h)
+as well as stdout/stderr filenames are defined as OAR-directives in
+script file.
 
 ## Launcher for MPI-processes
 
