@@ -21,7 +21,7 @@ launcher_serial.sh"""
 from os import environ, system
 from time import time, ctime
 from sys import argv
-
+import datetime
 
 def readAvailableNodes( nodefilename ):
     """Return a dict of node names
@@ -71,10 +71,17 @@ if __name__ == "__main__":
     else:
         coreDistribution =  "-j %i" %nodes[ nodes.keys()[0] ]
 
-
+    # preparing command and running it
     command = "cat %s | parallel -u %s --colsep ' ' %s {}" %(task_argumentFile,
                                                              coreDistribution,
                                                              task)
-    print ("Starting gnuparallel now %s" %ctime(time()) )
+    print ("%s - Starting gnuparallel" %ctime(time()) )
+    timeStart = datetime.datetime.now()
     system( command )
-    print ("Finishing %s" %ctime(time()) )
+    timeEnd = datetime.datetime.now()
+    print ("%s - Finished" %ctime(time()) )
+    timeDiff = (timeEnd - timeStart)
+    print ( "Duration %f seconds." %((timeDiff.microseconds + (timeDiff.seconds
+                                                               + timeDiff.days * 24. * 3600.) * 10**6)
+                                     / 10**6) )
+
