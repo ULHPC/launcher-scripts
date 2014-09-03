@@ -66,7 +66,8 @@ ARG_TASK_FILE=
 # Number of concurrent cores that have to be used on a node to perform a single task
 NB_CORE_PER_TASK=6
 
-NB_JOBS=4
+# Not needed anymore
+#NB_JOBS=4
 
 #####################################
 #                                   #
@@ -109,11 +110,11 @@ cat $OAR_NODEFILE | uniq -c | while read line; do
     NB_CORE=`echo $line  | awk '{ print $1 }'`
     HOSTNAME=`echo $line | awk '{ print $2 }'`
     n=$(( ${NB_CORE}/${NB_CORE_PER_TASK} ))
-    SSHLOGIN="$NB_CORE_PER_TASK/oarsh $HOSTNAME"
-    while [ $(( n -= 1 )) -ge 0 ]; do 
+    SSHLOGIN="$n/oarsh $HOSTNAME"
+    if [ $n -gt 0 ]; then 
         echo "${SSHLOGIN}" >> ${GP_SSHLOGINFILE}.task
         GP_SSHLOGIN_OPT="${GP_SSHLOGIN_OPT} --sshlogin '${SSHLOGIN}'"
-    done
+    fi
 done
 
 if [ -z "${ARG_TASK_FILE}" ]; then 
@@ -125,7 +126,7 @@ if [ -z "${ARG_TASK_FILE}" ]; then
     #    ${TASK} 2
     #    [...]
     #    ${TASK} ${NB_TASKS}
-    seq ${NB_TASKS} | parallel --tag -u -j ${NB_JOBS} --sshloginfile ${GP_SSHLOGINFILE}.task ${GP_OPTS} ${TASK} {}
+    seq ${NB_TASKS} | parallel --tag -u  --sshloginfile ${GP_SSHLOGINFILE}.task ${GP_OPTS} ${TASK} {}
 else 
     # ============
     #  Example 2:
@@ -137,7 +138,7 @@ else
     #    ${TASK} <line2>
     #    [...]
     #    ${TASK} <lastline>
-    cat ${ARG_TASK_FILE} | parallel --tag -u -j ${NB_JOBS} --sshloginfile ${GP_SSHLOGINFILE}.task --colsep ' ' ${GP_OPTS} ${TASK} {}
+    cat ${ARG_TASK_FILE} | parallel --tag -u  --sshloginfile ${GP_SSHLOGINFILE}.task --colsep ' ' ${GP_OPTS} ${TASK} {}
 fi
 
 
