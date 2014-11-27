@@ -127,7 +127,7 @@ SYNOPSIS
     $COMMAND [-V | -h]
     $COMMAND [--debug] [-v] [-n]
     $COMMAND [--mpirun PATH] [--datadir DIR] [--name NAME] [-npernode N] [-hostfile FILE] [--delay N] \
-             [--basedir DIR] [--exe prog1[,prog2,...] ]
+             [--exe prog1[,prog2,...] ]
 
 DESCRIPTION
     $COMMAND runs MPI programs on the UL HPC platform. You can easily customize
