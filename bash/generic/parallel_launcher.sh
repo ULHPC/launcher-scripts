@@ -110,6 +110,15 @@ cat $OAR_NODEFILE | uniq -c | while read line; do
     NB_CORE=`echo $line  | awk '{ print $1 }'`
     HOSTNAME=`echo $line | awk '{ print $2 }'`
     n=$(( ${NB_CORE}/${NB_CORE_PER_TASK} ))
+
+    # If NB_CORE is divisible by NB_CORE_PER_TASK, n remain unchanged, e.g., n = 6/6 = 1
+    # Otherwise, n = NB_CORE/NB_CORE_PER_TASK + 1, e.g., n = 1/6+1 = 0+1 = 1
+    # To make sure at least one ${GP_SSHLOGINFILE}.task will be created.
+    k=$(( n*${NB_CORE_PER_TASK} ))
+    if [ $k -ne ${NB_CORE} ];then
+        n=$(( n+1 ))
+    fi
+
     SSHLOGIN="$n/oarsh $HOSTNAME"
     if [ $n -gt 0 ]; then 
         echo "${SSHLOGIN}" >> ${GP_SSHLOGINFILE}.task
