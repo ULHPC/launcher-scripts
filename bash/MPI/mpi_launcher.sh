@@ -131,18 +131,18 @@ SYNOPSIS
 
 DESCRIPTION
     $COMMAND runs MPI programs on the UL HPC platform. You can easily customize
-    it by creating a local file ${CUSTOM_CONF} to overload the variables set on the 
+    it by creating a local file ${CUSTOM_CONF} to overload the variables set on the
     command line, mainly:
 
     * MODULE_TO_LOADstr comma-separated list of modules to load
     * MPI_PROG_BASEDIR  root directory hosting the MPI programs to execute
-                        Default: ${MPI_PROG_BASEDIR}  
-    * MPI_PROGstr       comma-separated list of MPI programs to execute (with relative 
+                        Default: ${MPI_PROG_BASEDIR}
+    * MPI_PROGstr       comma-separated list of MPI programs to execute (with relative
                         path to MPI_PROG_BASEDIR)
     * MPI_NPERNODE      what you might precise via -npernode command
-    * MPIRUN            mpirun command to use 
+    * MPIRUN            mpirun command to use
     * MACHINEFILE       machine file (or hostfile) to use
-    etc... 
+    etc...
 
 OPTIONS
     --debug
@@ -168,13 +168,13 @@ OPTIONS
     --delay
        Delay between consecutive runs (${DELAY}s by default)
     --basedir DIR
-       Set the root directory of the programs to be run 
+       Set the root directory of the programs to be run
        Default: ${MPI_PROG_BASEDIR}
     --datadir DIR
-       Set the root directory of the data directory that will host the outpiyt logs of the run 
+       Set the root directory of the data directory that will host the output logs of the run
        Default: ${DATADIR}
     --datadir DIR
-       Set the data  directory of the programs to be run 
+       Set the data  directory of the programs to be run
        Default: ${MPI_PROG_BASEDIR}
     --exe EXE[,EXE2...]
        Define the MPI programs to execute (with a relative path to BASEDIR)
@@ -296,7 +296,7 @@ while [ $# -ge 1 ]; do
         --name)        shift; NAME=$1;;
         --mpirun)      shift; MPIRUN=$1;;
         -np)           shift; MPI_NP=$1;;
-        -npernode | -perhost | -ppn | --npernode | --perhost | --ppn)     
+        -npernode | -perhost | -ppn | --npernode | --perhost | --ppn)
             shift; MPI_NPERNODE=$1;;
         -hostfile | --hostfile | --machinefile)
             shift; MACHINEFILE=$1;;
@@ -319,8 +319,8 @@ if [ -n "${MODULE_TO_LOAD}" ]; then
     execute "module purge"
     for mod in ${MODULE_TO_LOAD[*]}; do
         info "loading module $mod"
-        execute "module load $mod"        
-    done 
+        execute "module load $mod"
+    done
     execute "module list"
 fi
 
@@ -331,7 +331,7 @@ MPI_CMD="${MPIRUN} "
 if [ -n "${MACHINEFILE}" -a -f "${MACHINEFILE}" ]; then
     MPI_NP=`cat ${MACHINEFILE} | wc -l`
     MPI_CMD="${MPI_CMD} -hostfile ${MACHINEFILE}"
-else 
+else
     [ $MPI_NP -gt 1 ] && MPI_CMD="${MPI_CMD} -np ${MPI_NP}"
 fi
 if [ -n "${MPI_NPERNODE}" ]; then
@@ -341,7 +341,7 @@ if [ -n "${MPI_NPERNODE}" ]; then
     [[ "${MODULE_TO_LOAD}" =~ "OpenMPI" ]] && NPERNODE_CMDLINE="-npernode"
     [[ "${MODULE_TO_LOAD}" =~ "MVAPICH" ]] && NPERNODE_CMDLINE="-ppn"
     MPI_CMD="${MPI_CMD} ${NPERNODE_CMDLINE} ${MPI_NPERNODE}"
-fi 
+fi
 
 verbose "MPI command: '${MPI_CMD}'"
 
