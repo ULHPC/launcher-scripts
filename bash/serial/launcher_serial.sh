@@ -2,8 +2,8 @@
 ################################################################################
 # launcher_serial.sh -  Example of a generic launcher script using
 #     [GNU Parallel](http://www.gnu.org/software/parallel/)
-#     
-# Submit this job in passive mode by 
+#
+# Submit this job in passive mode by
 #
 #   oarsub [options] -S ./launcher_serial.sh
 #
@@ -50,7 +50,7 @@ MODULE_TO_LOAD=(ictce)
 
 # Characteristics of the reservation: number of cores on the first (and normally
 # only one) node
-NB_CORES_HEADNODE=`cat ${OAR_NODEFILE} | uniq -c | head -n1 | awk '{print $1}'`
+NB_CORES_HEADNODE=$(cat ${OAR_NODEFILE} | uniq -c | head -n1 | awk '{print $1}')
 # Default value
 : ${NB_CORES_HEADNODE:=1}
 
@@ -58,40 +58,40 @@ NB_CORES_HEADNODE=`cat ${OAR_NODEFILE} | uniq -c | head -n1 | awk '{print $1}'`
 # Java/C/C++/Ruby/Perl/Python/R/whatever program to run
 TASK="$HOME/mytask.sh"
 
-# Define here a file containing the arguments to pass to the task, one line per 
-# expected run. 
+# Define here a file containing the arguments to pass to the task, one line per
+# expected run.
 ARG_TASK_FILE=
 
 # Total number of tasks to be executed
-[ -n "${ARG_TASK_FILE}" ] && NB_TASKS=`cat ${ARG_TASK_FILE} | wc -l` || NB_TASKS=$(( 2*${NB_CORES_HEADNODE} ))
+[ -n "${ARG_TASK_FILE}" ] && NB_TASKS=$(wc -l ${ARG_TASK_FILE}) || NB_TASKS=$(( 2*NB_CORES_HEADNODE ))
 
 ################# Let's go ###############
 # Load the required modules
-for m in ${MODULE_TO_LOAD[*]}; do 
+for m in ${MODULE_TO_LOAD[*]}; do
     module load $m
 done
 
-# DIRECTORY WHERE TO RUN 
+# DIRECTORY WHERE TO RUN
 cd $WORK
 
-if [ -z "${ARG_TASK_FILE}" ]; then 
+if [ -z "${ARG_TASK_FILE}" ]; then
     # ============
     #  Example 1:
     # ============
     # use GNU parallel to perform the tasks on the node to run in
-    # parallel on the ${NB_CORES_HEADNODE} cores: 
+    # parallel on the ${NB_CORES_HEADNODE} cores:
     #    ${TASK} 1
     #    ${TASK} 2
     #    [...]
     #    ${TASK} ${NB_TASKS}
     seq ${NB_TASKS} | parallel -u -j ${NB_CORES_HEADNODE} ${TASK} {}
-else 
+else
     # ============
     #  Example 2:
     # ============
     # use GNU parallel to perform the tasks on the node to run in
     # parallel on the ${NB_CORES_HEADNODE} cores for each line of
-    # ${ARG_TASK_FILE} : 
+    # ${ARG_TASK_FILE} :
     #    ${TASK} <line1>
     #    ${TASK} <line2>
     #    [...]

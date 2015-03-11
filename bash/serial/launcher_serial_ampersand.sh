@@ -2,9 +2,9 @@
 ################################################################################
 # launcher_serial_ampersand.sh -  Example of a launcher script for running
 # sequential tasks using the Bash & (ampersand), a builtin control operator used
-# to fork processes, and the wait command. 
-#     
-# Submit this job in passive mode by 
+# to fork processes, and the wait command.
+#
+# Submit this job in passive mode by
 #
 #   oarsub [options] -S ./launcher_serial_ampersand.sh
 #
@@ -51,7 +51,7 @@ MODULE_TO_LOAD=(ictce)
 
 # Characteristics of the reservation: number of cores on the first (and normally
 # only one) node
-NB_CORES_HEADNODE=`cat ${OAR_NODEFILE} | uniq -c | head -n1 | awk '{print $1}'`
+NB_CORES_HEADNODE=$(cat ${OAR_NODEFILE} | uniq -c | head -n1 | awk '{print $1}')
 # Default value
 : ${NB_CORES_HEADNODE:=1}
 
@@ -59,39 +59,39 @@ NB_CORES_HEADNODE=`cat ${OAR_NODEFILE} | uniq -c | head -n1 | awk '{print $1}'`
 # Java/C/C++/Ruby/Perl/Python/R/whatever program to run
 TASK="$HOME/mytask.sh"
 
-# Define here a file containing the arguments to pass to the task, one line per 
-# expected run. 
+# Define here a file containing the arguments to pass to the task, one line per
+# expected run.
 ARG_TASK_FILE=
 
 # Total number of tasks to be executed
-[ -n "${ARG_TASK_FILE}" ] && NB_TASKS=`cat ${ARG_TASK_FILE} | wc -l` || NB_TASKS=$(( 2*${NB_CORES_HEADNODE} ))
+[ -n "${ARG_TASK_FILE}" ] && NB_TASKS=$(wc -l ${ARG_TASK_FILE}) || NB_TASKS=$(( 2*NB_CORES_HEADNODE ))
 
 ################# Let's go ###############
 # Load the required modules
-for m in ${MODULE_TO_LOAD[*]}; do 
+for m in ${MODULE_TO_LOAD[*]}; do
     module load $m
 done
 
-# DIRECTORY WHERE TO RUN 
+# DIRECTORY WHERE TO RUN
 cd $WORK
 
-if [ -z "${ARG_TASK_FILE}" ]; then 
+if [ -z "${ARG_TASK_FILE}" ]; then
     # ============
     #  Example 1:
     # ============
-    # Fork in parallel: 
+    # Fork in parallel:
     #    ${TASK} 1
     #    ${TASK} 2
     #    [...]
     #    ${TASK} ${NB_TASKS}
-    for i in `seq 1 ${NB_TASKS}`; do  
+    for i in $(seq 1 ${NB_TASKS}); do
         ${TASK} $i &
-    done 
-else 
+    done
+else
     # ============
     #  Example 2:
     # ============
-    # For each line of ${ARG_TASK_FILE}, fork in parallel: 
+    # For each line of ${ARG_TASK_FILE}, fork in parallel:
     #    ${TASK} <line1>
     #    ${TASK} <line2>
     #    [...]
@@ -101,7 +101,7 @@ else
     done < ${ARG_TASK_FILE}
 fi
 
-wait 
+wait
 # /!\ the wait command at the end is crucial; without it the job will terminate
-#     immediately, killing the ${NB_TASKS} forked processes you just started. 
+#     immediately, killing the ${NB_TASKS} forked processes you just started.
 

@@ -77,7 +77,7 @@ TASK="$HOME/mytask.sh 100"
 
 # Checkpoint context file, use the scratch filesystem if available
 CONTEXT=$SCRATCH
-[ "`df -T $SCRATCH | grep -c lustre`" == "0" ] && CONTEXT=$WORK
+[ "$(df -T $SCRATCH | grep -c lustre)" == "0" ] && CONTEXT=$WORK
 CONTEXT="$CONTEXT/mytask.context"
 
 # Run the task with blcr libraries
@@ -111,6 +111,8 @@ echo !!! PID  $PID !!!
 
 trap "echo !!! Checkpointing !!! ; $CHECKPOINT $PID ; exit $EXIT_UNFINISHED" $CHKPNT_SIGNAL
 
+# Or, you can forward the checkpointing signal to the process
+# trap "kill -$CHKPNT_SIGNAL $PID; wait $PID; exit $EXIT_UNFINISHED" $CHKPNT_SIGNAL
 
 # Wait for $CMD completion
 wait $RUNPID

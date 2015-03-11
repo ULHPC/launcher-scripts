@@ -1,11 +1,11 @@
 #! /bin/bash
 ################################################################################
 # NAIVE_AKA_BAD_launcher_serial.sh -  Example of a naive aka. (very) bad launcher script for
-#    running  sequential tasks. 
-#     
-# To see a better way to handle it, see launcher_serial.sh 
+#    running  sequential tasks.
 #
-# Submit this job in passive mode by 
+# To see a better way to handle it, see launcher_serial.sh
+#
+# Submit this job in passive mode by
 #
 #   oarsub [options] -S ./NAIVE_AKA_BAD_launcher_serial.sh
 #
@@ -52,7 +52,7 @@ MODULE_TO_LOAD=(ictce)
 
 # Characteristics of the reservation: number of cores on the first (and normally
 # only one) node
-NB_CORES_HEADNODE=`cat ${OAR_NODEFILE} | uniq -c | head -n1 | awk '{print $1}'`
+NB_CORES_HEADNODE=$(cat ${OAR_NODEFILE} | uniq -c | head -n1 | awk '{print $1}')
 # Default value
 : ${NB_CORES_HEADNODE:=1}
 
@@ -60,39 +60,39 @@ NB_CORES_HEADNODE=`cat ${OAR_NODEFILE} | uniq -c | head -n1 | awk '{print $1}'`
 # Java/C/C++/Ruby/Perl/Python/R/whatever program to run
 TASK="$HOME/mytask.sh"
 
-# Define here a file containing the arguments to pass to the task, one line per 
-# expected run. 
+# Define here a file containing the arguments to pass to the task, one line per
+# expected run.
 ARG_TASK_FILE=$HOME/mytask.args.example
 
 # Total number of tasks to be executed
-[ -n "${ARG_TASK_FILE}" ] && NB_TASKS=`cat ${ARG_TASK_FILE} | wc -l` || NB_TASKS=$(( 2*${NB_CORES_HEADNODE} ))
+[ -n "${ARG_TASK_FILE}" ] && NB_TASKS=$(wc -l ${ARG_TASK_FILE}) || NB_TASKS=$(( 2*NB_CORES_HEADNODE ))
 
 ################# Let's go ###############
 # Load the required modules
-for m in ${MODULE_TO_LOAD[*]}; do 
+for m in ${MODULE_TO_LOAD[*]}; do
     module load $m
 done
 
-# DIRECTORY WHERE TO RUN 
+# DIRECTORY WHERE TO RUN
 cd $WORK
 
-if [ -z "${ARG_TASK_FILE}" ]; then 
+if [ -z "${ARG_TASK_FILE}" ]; then
     # ============
     #  Example 1:
     # ============
-    # Run in a sequence: 
+    # Run in a sequence:
     #    ${TASK} 1
     #    ${TASK} 2
     #    [...]
     #    ${TASK} ${NB_TASKS}
-    for i in `seq 1 ${NB_TASKS}`; do  
+    for i in $(seq 1 ${NB_TASKS}); do
         ${TASK} $i
-    done 
-else 
+    done
+else
     # ============
     #  Example 2:
     # ============
-    # For each line of ${ARG_TASK_FILE}, run in a sequence: 
+    # For each line of ${ARG_TASK_FILE}, run in a sequence:
     #    ${TASK} <line1>
     #    ${TASK} <line2>
     #    [...]
