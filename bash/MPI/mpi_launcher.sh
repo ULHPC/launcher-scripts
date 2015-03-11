@@ -52,7 +52,7 @@ fi
 #                                   #
 #####################################
 VERSION=0.1
-COMMAND=`basename $0`
+COMMAND=$(basename $0)
 COMMAND_LINE="${COMMAND} $@"
 VERBOSE=""
 DEBUG=""
@@ -63,11 +63,10 @@ SIMULATION=""
 #   The launcher local variables    #
 #                                   #
 #####################################
-STARTDIR="$(pwd)"
 SCRIPTFILENAME=$(basename $0)
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Where the output files are produced
-DATADIR_RELATIVEPATH="runs/${SCRIPTFILENAME}/`date +%Y-%m-%d`"
+DATADIR_RELATIVEPATH="runs/${SCRIPTFILENAME}/$(date +%Y-%m-%d)"
 if [ -n "${SCRATCH}" ]; then
     [ "${SCRATCH}" != "/tmp" ] && DATADIR="${SCRATCH}/${DATADIR_RELATIVEPATH}" || DATADIR="${WORK}/${DATADIR_RELATIVEPATH}"
 else
@@ -78,11 +77,11 @@ DELAY=1
 
 ### User customization handling
 # Custom file where you can overload the default variables set for MPI
-CUSTOM_CONF="${SCRIPTDIR}/`basename ${SCRIPTFILENAME} .sh`.default.conf"
+CUSTOM_CONF="${SCRIPTDIR}/$(basename ${SCRIPTFILENAME} .sh).default.conf"
 # Hook file loaded BEFORE the mpirun command
-CUSTOM_HOOK_BEFORE="${SCRIPTDIR}/`basename ${SCRIPTFILENAME} .sh`.hook.before"
+CUSTOM_HOOK_BEFORE="${SCRIPTDIR}/$(basename ${SCRIPTFILENAME} .sh).hook.before"
 # Hook file loaded AFTER the mpirun command
-CUSTOM_HOOK_AFTER="${SCRIPTDIR}/`basename ${SCRIPTFILENAME} .sh`.hook.after"
+CUSTOM_HOOK_AFTER="${SCRIPTDIR}/$(basename ${SCRIPTFILENAME} .sh).hook.after"
 
 ##################################
 #                                #
@@ -93,8 +92,8 @@ CUSTOM_HOOK_AFTER="${SCRIPTDIR}/`basename ${SCRIPTFILENAME} .sh`.hook.after"
 MPIRUN="mpirun"
 MACHINEFILE="${OAR_NODEFILE}"
 MPI_NP=1
-[ -f "/proc/cpuinfo" ]   && MPI_NP=`grep processor /proc/cpuinfo | wc -l`
-[ -n "${OAR_NODEFILE}" ] && MPI_NP=`cat ${OAR_NODEFILE} | wc -l`
+[ -f "/proc/cpuinfo" ]   && MPI_NP=$(grep -c processor /proc/cpuinfo)
+[ -n "${OAR_NODEFILE}" ] && MPI_NP=$(wc -l ${OAR_NODEFILE})
 MPI_NPERNODE=
 
 # MPI program to execute
@@ -230,8 +229,8 @@ do_it() {
             error "Unable to find the MPI program ${fullprogname}"
             break
         fi
-        echo "=> performing MPI run ${prog} @ `date`"
-        date_prefix=`date +%Hh%Mm%S`
+        echo "=> performing MPI run ${prog} @ $(date)"
+        date_prefix=$(date +%Hh%Mm%S)
         if [ -z "${NAME}" ]; then
             logfile="${DATADIR_ABSPATH}/${OAR_JOBID}_results_${prog}_${date_prefix}.log"
         else
@@ -246,20 +245,20 @@ do_it() {
 #
 # Initial command: ${COMMAND_LINE}
 #
-# Generated @ `date` by:
+# Generated @ $(date) by:
 #   $command
 # (command performed in ${MPI_PROG_BASEDIR})
-### Starting timestamp: `date +%s`
+### Starting timestamp: $(date +%s)
 EOF
         debug "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
         echo "=> running '$command'"
         if [ -z "${SIMULATION}" ]; then
             cd ${MPI_PROG_BASEDIR}
-            echo "   command performed in `pwd`"
+            echo "   command performed in $(pwd)"
             $command |& tee -a ${logfile}
             cd -
         fi
-        echo "### Ending timestamp:     `date +%s`" >> ${logfile}
+        echo "### Ending timestamp:     $(date +%s)" >> ${logfile}
         echo "=> now sleeping for ${DELAY}s"
         sleep $DELAY
     done
@@ -329,7 +328,7 @@ MPI_CMD="${MPIRUN} "
 [[ "${MODULE_TO_LOAD}" =~ "OpenMPI" ]] && MPI_CMD="${MPI_CMD} -x LD_LIBRARY_PATH "
 [[ "${MODULE_TO_LOAD}" =~ "MVAPICH" ]] && MPI_CMD="${MPI_CMD} -launcher ssh -launcher-exec /usr/bin/oarsh "
 if [ -n "${MACHINEFILE}" -a -f "${MACHINEFILE}" ]; then
-    MPI_NP=`cat ${MACHINEFILE} | wc -l`
+  MPI_NP=$(wc -l ${MACHINEFILE})
     MPI_CMD="${MPI_CMD} -hostfile ${MACHINEFILE}"
 else
     [ $MPI_NP -gt 1 ] && MPI_CMD="${MPI_CMD} -np ${MPI_NP}"
@@ -349,7 +348,7 @@ verbose "MPI command: '${MPI_CMD}'"
 
 # Resources allocated
 verbose "==== ${MPI_NP} allocated resources used for the execution of ${MPI_PROGstr} ==="
-[ -n "${VERBOSE}" ] && cat $OAR_NODEFILE|uniq -c
+[ -n "${VERBOSE}" ] && uniq -c $OAR_NODEFILE
 
 if [ ! -d ${DATADIR} ]; then
     echo "=> creating ${DATADIR}"
@@ -358,7 +357,7 @@ fi
 
 # Move to the directory
 execute "cd ${DATADIR}"
-DATADIR_ABSPATH=`pwd`
+DATADIR_ABSPATH=$(pwd)
 
 # BEFORE HOOK
 if [ -f "${CUSTOM_HOOK_BEFORE}" ]; then
