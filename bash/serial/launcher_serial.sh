@@ -46,7 +46,7 @@ if [ -f  /etc/profile ]; then
 fi
 
 # Modules to preload
-MODULE_TO_LOAD=(ictce)
+MODULE_TO_LOAD=(toolchain/ictce)
 
 # Characteristics of the reservation: number of cores on the first (and normally
 # only one) node
