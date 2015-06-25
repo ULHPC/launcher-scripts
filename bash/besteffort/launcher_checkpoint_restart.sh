@@ -87,6 +87,10 @@ CHECKPOINT="cr_checkpoint -f $CONTEXT --kill -T" # + Process ID
 # Restart the process(es)
 RESTART="cr_restart --no-restore-pid $CONTEXT"
 
+# Disable NSCD for the processes started by cr_run
+# cf. https://upc-bugs.lbl.gov/blcr/doc/html/FAQ.html
+export LIBCR_DISABLE_NSCD=YES
+
 ##########################################
 # Run the job
 #
