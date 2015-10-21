@@ -76,6 +76,11 @@ GP_SSHLOGINFILE=/tmp/gnuparallel_hostfile.${OAR_JOBID}
 # Eventually drop here the options you want to pass to GNU parallel
 GP_OPTS=
 
+# Location of the GNU parallel specific wrapper around oarsh
+GP_WRAPPER=gpoarsh
+GP_WRAPPER_FILE=/opt/apps/wrappers/${GP_WRAPPER}
+[ ! -f ${GP_WRAPPER_FILE} ] && GP_WRAPPER_FILE=$(git rev-parse --show-toplevel)/wrappers/${GP_WRAPPER}
+[ ! -f ${GP_WRAPPER_FILE} ] && echo "Could not find the wrapper script 'gpoarsh'!"  && exit 1
 
 ################# Let's go ###############
 # Load the required modules
@@ -96,9 +101,10 @@ cd $WORK
 #       resource of one task as defined by ${NB_CORE_PER_TASK}, thus of the format
 #           <#core_per_task>/oarsh <hostname>
 
-cat $OAR_NODEFILE | awk '{printf "oarsh %s\n", $1}'  > ${GP_SSHLOGINFILE}.core
+JOBMODULELIST="$(printf :%s ${MODULE_TO_LOAD[@]})"
+cat $OAR_NODEFILE | awk -v gpw=$GP_WRAPPER_FILE -v jml=$JOBMODULELIST '{printf "%s %s %s\n", gpw, $1, jml}' > ${GP_SSHLOGINFILE}.core
 
-cat $OAR_NODEFILE | uniq -c | awk '{printf "%s/oarsh %s\n", $1, $2}' > ${GP_SSHLOGINFILE}.node
+cat $OAR_NODEFILE | uniq -c | awk -v gpw=$GP_WRAPPER_FILE -v jml=$JOBMODULELIST '{printf "%s/%s %s %s\n", gpw, $1, $2, jml}' > ${GP_SSHLOGINFILE}.node
 
 cat $OAR_NODEFILE | uniq -c | while read line; do
     NB_CORE=$(echo $line  | awk '{ print $1 }')
@@ -113,7 +119,7 @@ cat $OAR_NODEFILE | uniq -c | while read line; do
         n=$(( n+1 ))
     fi
 
-    SSHLOGIN="$n/oarsh $HOSTNAME"
+    SSHLOGIN="$n/$GP_WRAPPER_FILE $HOSTNAME $JOBMODULELIST"
     if [ $n -gt 0 ]; then
         echo "${SSHLOGIN}" >> ${GP_SSHLOGINFILE}.task
         GP_SSHLOGIN_OPT="${GP_SSHLOGIN_OPT} --sshlogin '${SSHLOGIN}'"

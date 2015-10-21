@@ -1,0 +1,18 @@
+#!/bin/bash
+################################################################################
+### File: gpoarsh
+### Description: Wrapper for oarsh to be used with GNU Parallel 
+###              Assumes four parameters are passed:
+###              1 - hostname
+###              2 - ssh force tty allocation (-tt)
+###              3 - ssh set log level to quiet (-oLogLevel=quiet)
+###              4 - colon separated list of environment modules to load
+################################################################################
+PARAMS="$1 $2 $3"
+JOBMODULELIST=$4
+CMDLINE="source /etc/profile ; module -q --ignore_cache load "
+for m in $(echo $JOBMODULELIST | sed 's/:/ /g'); do
+	CMDLINE+=" $m"
+done
+shift 4
+oarsh $PARAMS "$CMDLINE ; $@"
