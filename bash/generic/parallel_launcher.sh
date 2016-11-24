@@ -102,9 +102,9 @@ cd $WORK
 #           <#core_per_task>/oarsh <hostname>
 
 JOBMODULELIST="$(printf :%s ${MODULE_TO_LOAD[@]})"
-cat $OAR_NODEFILE | awk -v gpw=$GP_WRAPPER_FILE -v jml=$JOBMODULELIST '{printf "%s %s %s\n", gpw, $1, jml}' > ${GP_SSHLOGINFILE}.core
+cat $OAR_NODEFILE | awk -v gpw=$GP_WRAPPER_FILE -v jml=$JOBMODULELIST '{printf "%s %s %s\n", gpw, jml, $1}' > ${GP_SSHLOGINFILE}.core
 
-cat $OAR_NODEFILE | uniq -c | awk -v gpw=$GP_WRAPPER_FILE -v jml=$JOBMODULELIST '{printf "%s/%s %s %s\n", gpw, $1, $2, jml}' > ${GP_SSHLOGINFILE}.node
+cat $OAR_NODEFILE | uniq -c | awk -v gpw=$GP_WRAPPER_FILE -v jml=$JOBMODULELIST '{printf "%s/%s %s %s\n", $1, gpw, jml, $2}' > ${GP_SSHLOGINFILE}.node
 
 cat $OAR_NODEFILE | uniq -c | while read line; do
     NB_CORE=$(echo $line  | awk '{ print $1 }')
@@ -119,7 +119,7 @@ cat $OAR_NODEFILE | uniq -c | while read line; do
         n=$(( n+1 ))
     fi
 
-    SSHLOGIN="$n/$GP_WRAPPER_FILE $HOSTNAME $JOBMODULELIST"
+    SSHLOGIN="$n/$GP_WRAPPER_FILE $JOBMODULELIST $HOSTNAME"
     if [ $n -gt 0 ]; then
         echo "${SSHLOGIN}" >> ${GP_SSHLOGINFILE}.task
         GP_SSHLOGIN_OPT="${GP_SSHLOGIN_OPT} --sshlogin '${SSHLOGIN}'"
