@@ -78,7 +78,7 @@ GP_OPTS=
 
 # Location of the GNU parallel specific wrapper around oarsh
 GP_WRAPPER=gpoarsh
-GP_WRAPPER_FILE=/opt/apps/wrappers/${GP_WRAPPER}
+#GP_WRAPPER_FILE=/opt/apps/wrappers/${GP_WRAPPER}
 GP_WRAPPER_FILE=$(git rev-parse --show-toplevel)/wrappers/${GP_WRAPPER}
 [ ! -f ${GP_WRAPPER_FILE} ] && echo "Could not find the wrapper script 'gpoarsh'!"  && exit 1
 
