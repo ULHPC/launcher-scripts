@@ -1,0 +1,16 @@
+#!/bin/bash
+################################################################################
+### File: gpssh
+### Description: Wrapper for ssh to be used with GNU Parallel
+###              Assumes four parameters are passed:
+###              1 - colon separated list of environment modules to load
+###              2 - hostname
+################################################################################
+PARAMS="$2"
+JOBMODULELIST=$1
+CMDLINE="source /etc/profile ; module -q --ignore_cache load "
+for m in $(echo $JOBMODULELIST | sed 's/:/ /g'); do
+        CMDLINE+=" $m"
+done
+shift 3
+ssh $PARAMS "$CMDLINE ; $@"
