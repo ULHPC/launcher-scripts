@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/bash -l
 ################################################################################
 # NAIVE_AKA_BAD_launcher_serial.sh -  Example of a naive aka. (very) bad launcher script for
 #    running  sequential tasks.
@@ -10,6 +10,39 @@
 #   oarsub [options] -S ./NAIVE_AKA_BAD_launcher_serial.sh
 #
 ################################################################################
+
+##########################
+#                        #
+#  The SLURM directives  #
+#                        #
+##########################
+#
+#          Set number of resources
+#
+
+#SBATCH -N 1                # 1 node
+#SBATCH -c 28               # 28 cores 
+#SBATCH --time=0-01:00:00   # 1 hour
+
+#          Set the name of the job (up to 15 characters,
+#          no blank spaces, start with alphanumeric character)
+
+#SBATCH -J BADSerial
+
+#          By default, the standard output and error streams are sent
+#          to the same file in the current working directory with name:
+#              slurm-%j.out
+#          where % is the job number assigned when the job is submitted.
+#          Use the directive below to change the file to which the
+#          standard output and error streams are sent
+
+#SBATCH -o "slurm-%j.out"
+
+# Passive jobs specifications
+
+#SBATCH -p batch
+#SBATCH --qos=qos-batch
+
 
 ##########################
 #                        #
@@ -52,7 +85,8 @@ MODULE_TO_LOAD=(toolchain/ictce)
 
 # Characteristics of the reservation: number of cores on the first (and normally
 # only one) node
-NB_CORES_HEADNODE=$(cat ${OAR_NODEFILE} | uniq -c | head -n1 | awk '{print $1}')
+[ -n "${OAR_NODEFILE}" ]       && NB_CORES_HEADNODE=$(cat ${OAR_NODEFILE} | uniq -c | head -n1 | awk '{print $1}')
+[ -n "${SLURM_CPUS_ON_NODE}" ] && NB_CORES_HEADNODE=$SLURM_CPUS_ON_NODE
 # Default value
 : ${NB_CORES_HEADNODE:=1}
 
