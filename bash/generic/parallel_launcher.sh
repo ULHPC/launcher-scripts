@@ -19,7 +19,7 @@
 #
 
 #SBATCH -N 2                # 2 nodes
-#SBATCH -c 28               # 28 cores / node·
+#SBATCH -n 56               # 28 cores / node·
 #SBATCH --time=0-01:00:00   # 1 hour
 
 #          Set the name of the job (up to 15 characters,
