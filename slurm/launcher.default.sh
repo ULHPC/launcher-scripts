@@ -63,9 +63,11 @@ fi
 module purge
 module load toolchain/intel
 
+# Directory holding your built applications
+APPDIR="$HOME"
 # The task to be executed i.E. your favorite Java/C/C++/Ruby/Perl/Python/R/whatever program
 # to be invoked in parallel
-TASK="/path/to/app.exe"
+TASK="${APPDIR}/app.exe"
 
 # The command to run
 CMD="${TASK}"
@@ -92,6 +94,6 @@ EOF
 # Run the command
 ${CMD} |& tee -a ${LOGFILE}
 
-cat > ${LOGFILE} <<EOF
+cat >> ${LOGFILE} <<EOF
 ### Ending timestamp:     $(date +%s)
 EOF
