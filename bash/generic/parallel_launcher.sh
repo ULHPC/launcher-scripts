@@ -78,7 +78,7 @@ if [ -f  /etc/profile ]; then
 fi
 
 if [ -n "$OAR_JOBID" ] ; then
-  NODEFILE=$OAR_ODEFILE
+  NODEFILE=$OAR_NODEFILE
   JOBID=$OAR_JOBID
   GP_WRAPPER=gpoarsh
 elif [ -n "$SLURM_JOBID" ] ; then
