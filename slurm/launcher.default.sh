@@ -73,7 +73,7 @@ TASK="${APPDIR}/app.exe"
 CMD="${TASK}"
 ### General MPI Case:
 # CMD="srun -n $SLURM_NTASKS ${TASK}"
-### General OpenMPI case
+### OpenMPI case if you wish to specialize the MCA parameters
 #CMD="mpirun -np $SLURM_NTASKS --mca btl openib,self,sm ${TASK}"
 
 ### Prepare logfile
