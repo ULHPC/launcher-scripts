@@ -21,7 +21,7 @@
 #
 
 #SBATCH -N 1                # 1 node
-#SBATCH -c 28               # 28 cores 
+#SBATCH -c 28               # 28 cores
 #SBATCH --time=0-01:00:00   # 1 hour
 
 #          Set the name of the job (up to 15 characters,
@@ -36,7 +36,7 @@
 #          Use the directive below to change the file to which the
 #          standard output and error streams are sent
 
-#SBATCH -o "slurm-%j.out"
+#SBATCH -o "BADSerial-%j.out"
 
 # Passive jobs specifications
 
@@ -81,7 +81,7 @@ if [ -f  /etc/profile ]; then
 fi
 
 # Modules to preload
-MODULE_TO_LOAD=(toolchain/ictce)
+# MODULE_TO_LOAD=(toolchain/ictce)
 
 # Characteristics of the reservation: number of cores on the first (and normally
 # only one) node

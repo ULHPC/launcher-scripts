@@ -11,6 +11,38 @@
 
 ##########################
 #                        #
+#  The SLURM directives  #
+#                        #
+##########################
+#
+#          Set number of resources
+#
+
+#SBATCH -N 2                # 2 nodes
+#SBATCH -c 28               # 28 cores / node·
+#SBATCH --time=0-01:00:00   # 1 hour
+
+#          Set the name of the job (up to 15 characters,
+#          no blank spaces, start with alphanumeric character)
+
+#SBATCH -J GNUParallel
+
+#          By default, the standard output and error streams are sent
+#          to the same file in the current working directory with name:
+#              slurm-%j.out
+#          where % is the job number assigned when the job is submitted.
+#          Use the directive below to change the file to which the
+#          standard output and error streams are sent
+
+#SBATCH -o "GNUParallel-%j.out"
+
+# Passive jobs specifications
+
+#SBATCH -p batch
+#SBATCH --qos=qos-batch
+
+##########################
+#                        #
 #   The OAR  directives  #
 #                        #
 ##########################
@@ -45,11 +77,23 @@ if [ -f  /etc/profile ]; then
     .  /etc/profile
 fi
 
+if [ -n "$OAR_JOBID" ] ; then
+  NODEFILE=$OAR_ODEFILE
+  JOBID=$OAR_JOBID
+  GP_WRAPPER=gpoarsh
+elif [ -n "$SLURM_JOBID" ] ; then
+  NODEFILE=/tmp/slurm_nodefile_$SLURM_JOBID
+  srun hostname | sort -n > $NODEFILE
+  JOBID=$SLURM_JOBID
+  GP_WRAPPER=gpssh
+fi
+
+
 # Modules to preload
-MODULE_TO_LOAD=(toolchain/ictce)
+# MODULE_TO_LOAD=(toolchain/intel)
 
 # Characteristics of the reservation
-NB_HOSTS=$(cat ${OAR_NODEFILE} | uniq | wc -l)
+NB_HOSTS=$(cat ${NODEFILE} | uniq | wc -l)
 
 # The [serial] task to be executed i.E. your favorite
 # Java/C/C++/Ruby/Perl/Python/R/whatever program to be invoked in parallel
@@ -71,13 +115,12 @@ NB_CORE_PER_TASK=6
 #                                   #
 #####################################
 # File with sshlogins. The file consists of sshlogins on separate lines.
-GP_SSHLOGINFILE=/tmp/gnuparallel_hostfile.${OAR_JOBID}
+GP_SSHLOGINFILE=/tmp/gnuparallel_hostfile.${JOBID}
 
 # Eventually drop here the options you want to pass to GNU parallel
 GP_OPTS=
 
 # Location of the GNU parallel specific wrapper around oarsh
-GP_WRAPPER=gpoarsh
 GP_WRAPPER_FILE=/opt/apps/wrappers/${GP_WRAPPER}
 [ ! -f ${GP_WRAPPER_FILE} ] && GP_WRAPPER_FILE=$(git rev-parse --show-toplevel)/wrappers/${GP_WRAPPER}
 [ ! -f ${GP_WRAPPER_FILE} ] && echo "Could not find the wrapper script 'gpoarsh'!"  && exit 1
@@ -102,11 +145,11 @@ cd $WORK
 #           <#core_per_task>/oarsh <hostname>
 
 JOBMODULELIST="$(printf :%s ${MODULE_TO_LOAD[@]})"
-cat $OAR_NODEFILE | awk -v gpw=$GP_WRAPPER_FILE -v jml=$JOBMODULELIST '{printf "%s %s %s\n", gpw, jml, $1}' > ${GP_SSHLOGINFILE}.core
+cat $NODEFILE | awk -v gpw=$GP_WRAPPER_FILE -v jml=$JOBMODULELIST '{printf "%s %s %s\n", gpw, jml, $1}' > ${GP_SSHLOGINFILE}.core
 
-cat $OAR_NODEFILE | uniq -c | awk -v gpw=$GP_WRAPPER_FILE -v jml=$JOBMODULELIST '{printf "%s/%s %s %s\n", $1, gpw, jml, $2}' > ${GP_SSHLOGINFILE}.node
+cat $NODEFILE | uniq -c | awk -v gpw=$GP_WRAPPER_FILE -v jml=$JOBMODULELIST '{printf "%s/%s %s %s\n", $1, gpw, jml, $2}' > ${GP_SSHLOGINFILE}.node
 
-cat $OAR_NODEFILE | uniq -c | while read line; do
+cat $NODEFILE | uniq -c | while read line; do
     NB_CORE=$(echo $line  | awk '{ print $1 }')
     HOSTNAME=$(echo $line | awk '{ print $2 }')
     n=$(( NB_CORE/NB_CORE_PER_TASK ))
@@ -151,8 +194,8 @@ else
 fi
 
 
-# Cleanup (not mandatory as OAR will clean /tmp on job termination)
-# [ -f "${GP_SSHLOGINFILE}.core" ] && rm -f ${GP_SSHLOGINFILE}.core
-# [ -f "${GP_SSHLOGINFILE}.node" ] && rm -f ${GP_SSHLOGINFILE}.node
-# [ -f "${GP_SSHLOGINFILE}.task" ] && rm -f ${GP_SSHLOGINFILE}.task
-
+# Cleanup
+[ -f "${GP_SSHLOGINFILE}.core" ] && rm -f ${GP_SSHLOGINFILE}.core
+[ -f "${GP_SSHLOGINFILE}.node" ] && rm -f ${GP_SSHLOGINFILE}.node
+[ -f "${GP_SSHLOGINFILE}.task" ] && rm -f ${GP_SSHLOGINFILE}.task
+[ -n "$SLURM_JOBID"            ] && rm -f ${NODEFILE}
