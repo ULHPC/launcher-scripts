@@ -21,7 +21,7 @@
 #
 
 #SBATCH -N 1                # 1 node
-#SBATCH -n 28               # 28 cores
+#SBATCH -n 1                # 1 core
 #SBATCH --time=0-01:00:00   # 1 hour
 
 #          Set the name of the job (up to 15 characters,
@@ -53,7 +53,7 @@
 #          Set number of resources
 #
 
-#OAR -l nodes=1,walltime=1
+#OAR -l nodes=1,core=1,walltime=1
 
 #          Set the name of the job (up to 15 characters,
 #          no blank spaces, start with alphanumeric character)
