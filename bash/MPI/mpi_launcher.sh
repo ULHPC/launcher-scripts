@@ -66,7 +66,7 @@ SIMULATION=""
 SCRIPTFILENAME=$(basename $0)
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Where the output files are produced
-DATADIR_RELATIVEPATH="runs/${SCRIPTFILENAME}/$(date +%Y-%m-%d)"
+DATADIR_RELATIVEPATH="data/${SCRIPTFILENAME}/$(date +%Y-%m-%d)"
 if [ -n "${SCRATCH}" ]; then
     [ "${SCRATCH}" != "/tmp" ] && DATADIR="${SCRATCH}/${DATADIR_RELATIVEPATH}" || DATADIR="${WORK}/${DATADIR_RELATIVEPATH}"
 else
