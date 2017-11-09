@@ -335,7 +335,7 @@ else
 fi
 if [ -n "${MPI_NPERNODE}" ]; then
     NPERNODE_CMDLINE='-npernode'
-    [[ "${MODULE_TO_LOAD}" =~ "ictce" ]]   && NPERNODE_CMDLINE="-perhost"
+    [[ "${MODULE_TO_LOAD}" =~ "intel" ]]   && NPERNODE_CMDLINE="-perhost"
     [[ "${MODULE_TO_LOAD}" =~ "impi" ]]    && NPERNODE_CMDLINE="-perhost"
     [[ "${MODULE_TO_LOAD}" =~ "OpenMPI" ]] && NPERNODE_CMDLINE="-npernode"
     [[ "${MODULE_TO_LOAD}" =~ "MVAPICH" ]] && NPERNODE_CMDLINE="-ppn"
