@@ -66,7 +66,7 @@ SIMULATION=""
 SCRIPTFILENAME=$(basename $0)
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Where the output files are produced
-DATADIR_RELATIVEPATH="runs/${SCRIPTFILENAME}/$(date +%Y-%m-%d)"
+DATADIR_RELATIVEPATH="data/${SCRIPTFILENAME}/$(date +%Y-%m-%d)"
 if [ -n "${SCRATCH}" ]; then
     [ "${SCRATCH}" != "/tmp" ] && DATADIR="${SCRATCH}/${DATADIR_RELATIVEPATH}" || DATADIR="${WORK}/${DATADIR_RELATIVEPATH}"
 else
@@ -335,7 +335,7 @@ else
 fi
 if [ -n "${MPI_NPERNODE}" ]; then
     NPERNODE_CMDLINE='-npernode'
-    [[ "${MODULE_TO_LOAD}" =~ "ictce" ]]   && NPERNODE_CMDLINE="-perhost"
+    [[ "${MODULE_TO_LOAD}" =~ "intel" ]]   && NPERNODE_CMDLINE="-perhost"
     [[ "${MODULE_TO_LOAD}" =~ "impi" ]]    && NPERNODE_CMDLINE="-perhost"
     [[ "${MODULE_TO_LOAD}" =~ "OpenMPI" ]] && NPERNODE_CMDLINE="-npernode"
     [[ "${MODULE_TO_LOAD}" =~ "MVAPICH" ]] && NPERNODE_CMDLINE="-ppn"
