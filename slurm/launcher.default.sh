@@ -1,5 +1,5 @@
 #!/bin/bash -l
-# Time-stamp: <Sun 2017-06-11 22:13 svarrette>
+# Time-stamp: <Mon 2018-06-18 09:48 svarrette>
 ##################################################################
 
 ##########################
@@ -29,7 +29,7 @@
 echo "SLURM_JOBID  = ${SLURM_JOBID}"
 echo "SLURM_JOB_NODELIST = ${SLURM_JOB_NODELIST}"
 echo "SLURM_NNODES = ${SLURM_NNODES}"
-echo "SLURM_NTASK  = ${SLURM_NNODES}"
+echo "SLURM_NTASK  = ${SLURM_NTASKS}"
 echo "SLURMTMPDIR  = ${SLURMTMPDIR}"
 echo "Submission directory = ${SLURM_SUBMIT_DIR}"
 
