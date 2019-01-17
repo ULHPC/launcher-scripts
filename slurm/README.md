@@ -11,3 +11,12 @@ Summary of what you will find:
 * 3-checkpoint-restart: [DMTCP](https://github.com/dmtcp/dmtcp): Distributed MultiThreaded CheckPointing launchers
 * 4-application-specific: launchers for specific applications (Apache Spark, MATLAB, ABAQUS, ANSYS)
 * launcher.default.sh: example launcher with detailed comments
+
+Many other (application-specific) launchers can be found within the the [UL HPC Tutorial](https://ulhpc-tutorials.readthedocs.io) pages. 
+Ex: 
+
+* Launchers for [OpenMP/MPI/Hybrid runs](https://github.com/ULHPC/tutorials/tree/devel/parallel/basics/runs)
+* Launchers for [R runs](https://github.com/ULHPC/tutorials/blob/devel/maths/R/launcher.sh)
+* Launchers for [Spark standalone cluster](https://github.com/ULHPC/tutorials/blob/devel/bigdata/runs/launcher.Spark.sh)
+
+etc. 
