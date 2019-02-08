@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/bash -l
 ################################################################################
 # mpi_launcher.sh -  Example of a launcher script for MPI
 #
@@ -42,9 +42,9 @@
 #                                   #
 #####################################
 
-if [ -f  /etc/profile ]; then
-    .  /etc/profile
-fi
+#if [ -f  /etc/profile ]; then
+#    .  /etc/profile
+#fi
 
 #####################################
 #                                   #
