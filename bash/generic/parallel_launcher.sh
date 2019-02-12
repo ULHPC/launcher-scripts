@@ -190,7 +190,7 @@ else
     #    ${TASK} <line2>
     #    [...]
     #    ${TASK} <lastline>
-    cat ${ARG_TASK_FILE} | parallel --tag -u  --sshloginfile ${GP_SSHLOGINFILE}.task --colsep ' ' ${GP_OPTS} ${TASK} {}
+    cat ${ARG_TASK_FILE} | parallel --tag -u  --sshloginfile ${GP_SSHLOGINFILE}.task --colsep '\n' ${GP_OPTS} ${TASK} {}
 fi
 
 
