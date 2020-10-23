@@ -8,7 +8,7 @@
 #SBATCH -c 1
 #SBATCH --time=0-01:00:00
 #SBATCH -p batch
-#SBATCH --qos=qos-batch
+#SBATCH --qos=normal
 #SBATCH -L perfreport:56
 
 module load toolchain/intel

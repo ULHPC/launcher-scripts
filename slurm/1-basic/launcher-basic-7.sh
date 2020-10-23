@@ -1,5 +1,5 @@
 #!/bin/bash -l
-## Run a single core, 3 day long job in the dedicated partition
+## Run a single core, 3 day long job in the batch partition
 ## Valentin Plugaru <Valentin.Plugaru@uni.lu>
 #SBATCH -J MyLongJob
 #SBATCH --mail-type=all
@@ -7,8 +7,8 @@
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=1
 #SBATCH --time=3-00:00:00
-#SBATCH -p long
-#SBATCH --qos=qos-long
+#SBATCH -p batch
+#SBATCH --qos=long
 
 echo "== Starting run at $(date)"
 echo "== Job ID: ${SLURM_JOBID}"

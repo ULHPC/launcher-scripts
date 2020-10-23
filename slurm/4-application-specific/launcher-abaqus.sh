@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --time=01:00:00
 #SBATCH -p batch
-#SBATCH --qos qos-batch
+#SBATCH --qos normal
 #SBATCH -o %x-%j.log
 
 ### Load latest available ABAQUS
@@ -17,7 +17,7 @@ module load cae/ABAQUS
 unset SLURM_GTIDS
 
 ### Create ABAQUS environment file for current job, you can set/add your own options (Python syntax)
-env_file=abaqus_v6.env 
+env_file=abaqus_v6.env
 
 cat << EOF > ${env_file}
 #verbose = 3

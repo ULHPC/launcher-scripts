@@ -41,7 +41,7 @@
 # Passive jobs specifications
 
 #SBATCH -p batch
-#SBATCH --qos=qos-batch
+#SBATCH --qos=normal
 
 
 ##########################

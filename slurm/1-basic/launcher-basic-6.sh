@@ -9,10 +9,10 @@
 #SBATCH --mem=64GB
 #SBATCH --time=1-00:00:00
 #SBATCH -p batch
-#SBATCH --qos=qos-batch
+#SBATCH --qos=normal
 
 echo "== Starting run at $(date)"
 echo "== Job ID: ${SLURM_JOBID}"
 echo "== Node list: ${SLURM_NODELIST}"
 echo "== Submit dir. : ${SLURM_SUBMIT_DIR}"
-# Your more useful application can be started below! 
+# Your more useful application can be started below!

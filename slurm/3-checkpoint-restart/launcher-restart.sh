@@ -12,7 +12,7 @@
 #SBATCH --mem=64GB
 #SBATCH --time=0-06:00:00
 #SBATCH -p batch
-#SBATCH --qos=qos-batch
+#SBATCH --qos=normal
 
 #----------------------------- Set up DMTCP environment for a job ------------#
 

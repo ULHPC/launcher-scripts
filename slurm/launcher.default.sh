@@ -23,7 +23,7 @@
 
 #          Passive jobs specifications
 #SBATCH --partition=batch
-#SBATCH --qos qos-batch
+#SBATCH --qos normal
 
 ### General SLURM Parameters
 echo "SLURM_JOBID  = ${SLURM_JOBID}"

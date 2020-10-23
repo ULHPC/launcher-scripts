@@ -8,7 +8,7 @@
 #SBATCH -c 28
 #SBATCH --time=0-01:00:00
 #SBATCH -p batch
-#SBATCH --qos=qos-batch
+#SBATCH --qos=normal
 
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
 srun /path/to/your/threaded.app

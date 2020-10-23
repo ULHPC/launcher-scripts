@@ -7,7 +7,7 @@
 #SBATCH -c 28
 #SBATCH --time=0-01:00:00
 #SBATCH -p batch
-#SBATCH --qos=qos-batch
+#SBATCH --qos=normal
 
 module load toolchain/intel
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}

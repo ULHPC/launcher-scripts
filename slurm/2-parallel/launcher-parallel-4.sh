@@ -7,7 +7,7 @@
 #SBATCH -c 1
 #SBATCH --time=0-01:00:00
 #SBATCH -p batch
-#SBATCH --qos=qos-batch
+#SBATCH --qos=normal
 
 module load toolchain/foss
 srun -n $SLURM_NTASKS /path/to/your/foss-toolchain-compiled-application

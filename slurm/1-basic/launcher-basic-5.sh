@@ -9,7 +9,7 @@
 #SBATCH --time=0-01:00:00
 #SBATCH --array=0-9%3
 #SBATCH -p batch
-#SBATCH --qos=qos-batch
+#SBATCH --qos=normal
 
 echo "== Starting run at $(date)"
 echo "== Job ID: ${SLURM_JOBID}, Task ID: ${SLURM_ARRAY_TASK_ID}"
